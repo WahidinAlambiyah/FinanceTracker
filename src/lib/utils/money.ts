@@ -81,26 +81,32 @@ export function formatRupiahCompact(amount: number): string {
 /**
  * Parse user input string to integer amount
  * 
- * Handles various input formats:
+ * Handles various input formats including Indonesian decimal separator (comma):
  * - "10000" -> 10000
- * - "10.000" -> 10000
- * - "10,000" -> 10000
+ * - "10.000" -> 10000 (Indonesian thousands separator)
+ * - "10,000" -> 10000 (English thousands separator)
  * - "Rp 10.000" -> 10000
  * - "10k" or "10rb" -> 10000
- * - "1.5jt" or "1.5m" -> 1500000
+ * - "1.5jt" -> 1500000 (dot as decimal for multiplier)
+ * - "1,5jt" -> 1500000 (comma as decimal for multiplier - Indonesian style)
+ * - "1.500.000" -> 1500000 (Indonesian full format)
+ * - "1,500,000" -> 1500000 (English full format with commas)
  * 
  * @param input - User input string
  * @returns Parsed integer amount, or null if invalid
  * 
  * @example
  * ```typescript
- * parseRupiahInput("10000");      // 10000
- * parseRupiahInput("Rp 10.000");  // 10000
- * parseRupiahInput("10k");        // 10000
- * parseRupiahInput("10rb");       // 10000
- * parseRupiahInput("1.5jt");      // 1500000
- * parseRupiahInput("abc");        // null
- * parseRupiahInput("");           // null
+ * parseRupiahInput("10000");       // 10000
+ * parseRupiahInput("Rp 10.000");   // 10000
+ * parseRupiahInput("10k");         // 10000
+ * parseRupiahInput("10rb");        // 10000
+ * parseRupiahInput("1.5jt");       // 1500000
+ * parseRupiahInput("1,5jt");       // 1500000 (Indonesian decimal)
+ * parseRupiahInput("1.500.000");   // 1500000
+ * parseRupiahInput("1,500,000");   // 1500000
+ * parseRupiahInput("abc");         // null
+ * parseRupiahInput("");            // null
  * ```
  */
 export function parseRupiahInput(input: string): number | null {
@@ -114,7 +120,6 @@ export function parseRupiahInput(input: string): number | null {
     .toLowerCase()
     .replace(/rp\.?/g, '')
     .replace(/\s+/g, '')
-    .replace(/,/g, ''); // Remove commas (English format)
   
   // Handle shorthand suffixes
   let multiplier = 1;
@@ -130,29 +135,63 @@ export function parseRupiahInput(input: string): number | null {
     cleaned = cleaned.replace(/(m|miliar)$/, '');
   }
   
-  // Replace Indonesian decimal separator (.) with standard (.)
-  // This handles both "10.000" (Indonesian thousands) and "1.5" (decimal)
-  // We need to be careful here - if there are multiple dots, it's thousands separator
+  // Normalize separators:
+  // Indonesian uses: dot (.) for thousands, comma (,) for decimals
+  // English uses: comma (,) for thousands, dot (.) for decimals
+  // Strategy: Detect which format and normalize to JavaScript standard (dot as decimal)
+  
   const dotCount = (cleaned.match(/\./g) || []).length;
+  const commaCount = (cleaned.match(/,/g) || []).length;
   
   if (dotCount > 1) {
-    // Multiple dots means thousands separator - remove them all
-    cleaned = cleaned.replace(/\./g, '');
-  } else if (dotCount === 1) {
-    // Single dot - could be decimal or thousands
-    // If there are digits after the dot and they're <= 2, treat as decimal
-    // Otherwise, treat as thousands separator
-    const parts = cleaned.split('.');
-    if (parts[1] && parts[1].length <= 2) {
-      // Treat as decimal (for multiplier input like "1.5jt")
-      cleaned = parts[0] + '.' + parts[1];
+    // Multiple dots = Indonesian thousands separator (e.g., "1.500.000")
+    // Remove all dots, then convert any comma to decimal
+    cleaned = cleaned.replace(/\./g, '').replace(/,/g, '.');
+  } else if (commaCount > 1) {
+    // Multiple commas = English thousands separator (e.g., "1,500,000")
+    // Remove all commas, dot is already decimal
+    cleaned = cleaned.replace(/,/g, '');
+  } else if (dotCount === 1 && commaCount === 1) {
+    // Both present - determine which is thousands and which is decimal
+    const dotIndex = cleaned.indexOf('.');
+    const commaIndex = cleaned.indexOf(',');
+    
+    if (dotIndex < commaIndex) {
+      // Dot before comma: Indonesian format "1.500,5" -> remove dot, comma to decimal
+      cleaned = cleaned.replace(/\./g, '').replace(/,/g, '.');
     } else {
-      // Treat as thousands separator
+      // Comma before dot: English format "1,500.5" -> remove comma, keep dot
+      cleaned = cleaned.replace(/,/g, '');
+    }
+  } else if (commaCount === 1) {
+    // Single comma - could be Indonesian decimal or English thousands
+    const parts = cleaned.split(',');
+    if (parts[1] && parts[1].length <= 2 && multiplier > 1) {
+      // Likely decimal (for multiplier input like "1,5jt")
+      cleaned = parts[0] + '.' + parts[1];
+    } else if (parts[1] && parts[1].length === 3) {
+      // Likely thousands separator (e.g., "10,000")
+      cleaned = cleaned.replace(/,/g, '');
+    } else {
+      // Ambiguous - assume decimal for multiplier context
+      cleaned = cleaned.replace(/,/g, '.');
+    }
+  } else if (dotCount === 1) {
+    // Single dot - could be decimal or Indonesian thousands
+    const parts = cleaned.split('.');
+    if (parts[1] && parts[1].length <= 2 && multiplier > 1) {
+      // Likely decimal (for multiplier input like "1.5jt")
+      cleaned = parts[0] + '.' + parts[1];
+    } else if (parts[1] && parts[1].length === 3) {
+      // Likely thousands separator (e.g., "10.000")
       cleaned = cleaned.replace(/\./g, '');
+    } else {
+      // Keep as decimal
+      // (already in correct format)
     }
   }
   
-  // Parse as float (to handle decimal multipliers like "1.5jt")
+  // Parse as float (to handle decimal multipliers like "1.5jt" or "1,5jt")
   const parsed = parseFloat(cleaned);
   
   if (isNaN(parsed)) {

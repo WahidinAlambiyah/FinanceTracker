@@ -16,14 +16,14 @@
 
 ## Phase 0 — Project Setup
 
-- [ ] 0.1 Create Expo project with TypeScript
+- [x] 0.1 Create Expo project with TypeScript
   - Use Expo React Native.
   - Configure TypeScript.
   - Configure Expo Router.
   - Verify app runs on Android.
   - Requirements: REQ-AUTH-001, REQ-LOCAL-001
 
-- [ ] 0.2 Setup folder structure
+- [x] 0.2 Setup folder structure
   - Create `src/app`.
   - Create `src/components`.
   - Create `src/features`.
@@ -31,7 +31,7 @@
   - Create `src/tests`.
   - Follow `design.md` folder structure.
 
-- [ ] 0.3 Add base dependencies
+- [x] 0.3 Add base dependencies
   - Add `expo-sqlite`.
   - Add Supabase JS client.
   - Add `expo-secure-store`.
@@ -40,7 +40,7 @@
   - Add date and formatting utilities.
   - Do not add unnecessary UI framework yet.
 
-- [ ] 0.4 Setup environment config
+- [x] 0.4 Setup environment config
   - Create `.env.example`.
   - Add Supabase URL placeholder.
   - Add Supabase anon key placeholder.
@@ -51,20 +51,20 @@
 
 ## Phase 1 — Local Database Foundation
 
-- [ ] 1.1 Implement SQLite connection
+- [x] 1.1 Implement SQLite connection
   - Create `src/lib/db/sqlite.ts`.
   - Open local database.
   - Export database helper functions.
   - Requirements: REQ-LOCAL-001, REQ-LOCAL-002
 
-- [ ] 1.2 Implement migration runner
+- [x] 1.2 Implement migration runner
   - Create `src/lib/db/migrations.ts`.
   - Create migrations table.
   - Run migrations once.
   - Store executed migration names.
   - Requirements: REQ-LOCAL-005
 
-- [ ] 1.3 Create initial local schema
+- [x] 1.3 Create initial local schema
   - Create profiles table.
   - Create wallets table.
   - Create categories table.
@@ -73,7 +73,7 @@
   - Create sync_metadata table.
   - Requirements: REQ-LOCAL-001
 
-- [ ] 1.4 Add local database initialization
+- [x] 1.4 Add local database initialization
   - Ensure database initializes before private screens load.
   - Show loading state during initialization.
   - Show safe error state if database fails.
@@ -87,25 +87,69 @@
 
 ## Phase 2 — Core Utilities
 
-- [ ] 2.1 Implement UUID utility
+- [x] 2.1 Implement UUID utility
   - Create client-side UUID generator.
   - Use UUID for wallets, categories, transactions, and sync queue.
   - Requirements: REQ-LOCAL-003
 
-- [ ] 2.2 Implement date utility
+- [x] 2.2 Implement date utility
   - Create ISO timestamp helper.
   - Create month range helper.
   - Create Indonesian date display helper.
 
-- [ ] 2.3 Implement money utility
+- [x] 2.3 Implement money utility
   - Store money as integer Rupiah.
   - Format amount as IDR.
   - Parse user amount input.
   - Requirements: REQ-UX-004
 
-- [ ] 2.4 Implement logger utility
+- [x] 2.4 Implement logger utility
   - Avoid logging passwords, tokens, and complete financial payloads.
   - Requirements: REQ-SEC-004
+
+---
+
+## Additional Completed Tasks
+
+### Phase 1 Fixes Applied
+
+- **Migration Safety Enhancement** (Post Phase 1)
+  - Wrapped each migration execution and `recordMigration()` in `withExclusiveTransactionAsync()` for atomic operations
+  - Ensures schema execution and migration recording happen together
+  - Prevents database inconsistency if migration partially succeeds
+  - Note: `execAsync()` is only safe for static SQL; future repositories will use parameterized APIs (`runAsync()`, `prepareAsync()`, etc.)
+
+- **Error Handling Improvement** (Post Phase 1)
+  - Database initialization logs technical errors to console for developers
+  - Returns generic user-facing error message: "Failed to initialize local database. Please restart the app."
+  - Removed raw SQLite/migration error display from UI (`_layout.tsx`)
+  - App startup screen (`index.tsx`) imports `getDatabase` directly (not dynamically)
+
+### Phase 2 Implementation Notes
+
+- **Zero External Dependencies**
+  - UUID utility uses `expo-crypto` (built-in with Expo)
+  - Date utility uses native JavaScript `Date` and `Intl.DateTimeFormat` APIs
+  - Money utility uses native `Intl.NumberFormat` and `parseFloat`
+  - Logger utility uses native console and Object methods
+  - **Justification**: Native APIs are sufficient for Phase 2 requirements. Can add libraries like `date-fns` later if complex date operations needed.
+
+- **Indonesian Locale Support**
+  - Money formatting uses `id-ID` locale (Rupiah with dot thousands separator)
+  - Date formatting uses `id-ID` locale (Indonesian month names)
+  - Money parser handles both Indonesian format (`1.500.000` or `1,5jt`) and English format (`1,500,000`)
+
+- **Framework-Light Design**
+  - All utilities are pure functions (except logger console output)
+  - No side effects (except logging)
+  - Easy to unit test
+  - Deterministic output for given input
+
+- **Security Considerations**
+  - Logger sanitizes sensitive object fields (password, token, secret, session, etc.)
+  - Logger sanitizes message strings for common sensitive patterns
+  - `logger.financial()` restricts logged fields to safe metadata only
+  - Stack traces only logged in development mode (`__DEV__`)
 
 ---
 

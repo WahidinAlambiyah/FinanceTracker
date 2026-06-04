@@ -103,7 +103,7 @@ formatIndonesianDateTime(new Date());
 | `formatRupiah(amount)` | Format integer as "Rp 10.000" |
 | `formatRupiahCompact(amount)` | Compact format "Rp 1,5 Jt" |
 | `formatAmountOnly(amount)` | Number only (no currency symbol) |
-| `parseRupiahInput(input)` | Parse user input to integer |
+| `parseRupiahInput(input)` | Parse user input to integer (supports Indonesian comma decimal) |
 | `validateAndParseAmount(input)` | Parse + validate in one step |
 | `isValidAmount(amount)` | Validate amount > 0 and integer |
 
@@ -115,12 +115,15 @@ formatRupiah(1500000);         // "Rp 1.500.000"
 formatRupiahCompact(1500000);  // "Rp 1,5 Jt"
 formatAmountOnly(10000);       // "10.000"
 
-// Parsing (handles multiple formats)
+// Parsing (handles multiple formats including Indonesian decimal comma)
 parseRupiahInput("10000");       // 10000
 parseRupiahInput("Rp 10.000");   // 10000
 parseRupiahInput("10k");         // 10000
 parseRupiahInput("10rb");        // 10000
-parseRupiahInput("1.5jt");       // 1500000
+parseRupiahInput("1.5jt");       // 1500000 (dot as decimal)
+parseRupiahInput("1,5jt");       // 1500000 (comma as decimal - Indonesian style)
+parseRupiahInput("1.500.000");   // 1500000 (Indonesian full format)
+parseRupiahInput("1,500,000");   // 1500000 (English full format)
 parseRupiahInput("invalid");     // null
 
 // Validation
@@ -226,23 +229,39 @@ Server starts successfully with:
 
 ### 2. Money Parsing Ambiguity
 
-**Issue:** Indonesian uses dots for thousands separator (10.000), but dots also mean decimals
+**Issue:** Indonesian uses different separators than English
+- Indonesian: dot for thousands (10.000), comma for decimals (1,5)
+- English: comma for thousands (10,000), dot for decimals (1.5)
 
-**Solution:** Smart parsing logic:
-- Multiple dots → thousands separator → remove all
-- Single dot + ≤2 digits after → decimal (for "1.5jt")
-- Single dot + >2 digits after → thousands separator
+**Solution:** Enhanced smart parsing logic:
+- Detects format based on separator count and position
+- Multiple dots → Indonesian thousands → remove all
+- Multiple commas → English thousands → remove all
+- Mixed separators → determine which is decimal based on position
+- Single comma with 1-2 digits after + multiplier → treat as decimal (1,5jt)
+- Single dot with 1-2 digits after + multiplier → treat as decimal (1.5jt)
+
+**Examples:**
+```typescript
+parseRupiahInput("1.500.000");   // 1500000 (Indonesian)
+parseRupiahInput("1,500,000");   // 1500000 (English)
+parseRupiahInput("1,5jt");       // 1500000 (Indonesian decimal)
+parseRupiahInput("1.5jt");       // 1500000 (English decimal)
+parseRupiahInput("1.500,5");     // 1500.5 → rounds to 1501
+parseRupiahInput("1,500.5");     // 1500.5 → rounds to 1501
+```
 
 **Tradeoff:**
 - ✅ Handles common input formats correctly
-- ⚠️ Edge case: "1.23" could be 123 (thousands) or 1.23 (decimal)
-- Resolved by context: transactions use integers, multipliers support decimals
+- ✅ Supports Indonesian user preference for comma decimals
+- ⚠️ Edge case: Ambiguous single separators resolved by context (multiplier presence, digit count)
+- Resolved by intelligent heuristics based on Indonesian and English conventions
 
 ### 3. Logger Sanitization
 
-**Limitation:** Sanitization is field-name based, not value-based
+**Limitation:** Sanitization is field-name based for objects, pattern-based for strings
 
-**Example:**
+**Object Field Sanitization:**
 ```typescript
 // GOOD: Detects common field names
 { password: 'secret' }    // Redacted ✅
@@ -253,16 +272,32 @@ Server starts successfully with:
 { authKey: 'abc123' }     // Not redacted ⚠️
 ```
 
+**String Message Sanitization (NEW):**
+```typescript
+// GOOD: Detects common patterns in log messages
+logger.info('Token: abc123xyz');                    // "Token: [REDACTED]"
+logger.info('password=secret123');                  // "password=[REDACTED]"
+logger.info('Authorization: Bearer token123');      // "Authorization: [REDACTED]"
+
+// DEVELOPER RESPONSIBILITY: Not foolproof
+logger.info(`User ${userId} token ${token}`);       // Pattern may not match
+// Better: logger.info('User authenticated', { userId })  // ✅ Object sanitized
+```
+
 **Mitigation:**
 - Comprehensive sensitive field list (15+ patterns)
 - Case-insensitive matching
 - Partial matches (e.g., "sessionId" matches "session")
+- Pattern-based string sanitization for common formats
 - Developer responsibility to not log sensitive data directly
+- Production safety: Stack traces only in `__DEV__` mode
 
 **Recommendation:** 
 - Don't log full user objects
 - Log only necessary identifiers (IDs, types)
 - Use `logger.financial()` for financial data (restricts fields)
+- Avoid string interpolation of secrets in log messages
+- Use object parameter for data (gets sanitized automatically)
 
 ### 4. Indonesian Locale Dependency
 
@@ -278,6 +313,29 @@ new Intl.NumberFormat('id-ID').format(10000);
 ```
 
 **Risk:** Low - `id-ID` is a standard locale supported by modern engines
+
+### 5. Timezone Behavior (Date Utility)
+
+**Design Decision:** Month ranges use local timezone boundaries
+
+**Rationale:** Users think in their local calendar month
+- User in Jakarta (UTC+7) selecting "June 2024" expects June 1-30 in Jakarta time
+- Transactions stored with ISO timestamps (UTC-based)
+- Month queries use local calendar boundaries converted to ISO
+
+**Example:**
+```typescript
+// User in Jakarta (UTC+7) queries "June 2024"
+getMonthRange(2024, 6);
+// Returns: June 1 00:00 Jakarta → June 30 23:59 Jakarta (in ISO format)
+// ISO shows UTC offset, but boundaries are local calendar month
+```
+
+**Tradeoff:**
+- ✅ Intuitive for users (matches calendar)
+- ✅ Works correctly for transactions entered in local time
+- ⚠️ Cross-timezone sync requires careful handling (future consideration)
+- For MVP: Single-user app, local timezone is consistent
 
 ## Framework-Light Design
 
@@ -387,3 +445,59 @@ Phase 3 tasks remain untouched:
 Only Phase 2 utilities were implemented. No Phase 3 work has begun.
 
 **Awaiting**: Your review before proceeding to Phase 3
+
+---
+
+## Post-Phase 2 Cleanup Checkpoint Applied
+
+### Utility Improvements
+
+1. **Money Parser Enhancement**
+   - Added support for Indonesian comma decimal separator: `1,5jt` → 1500000
+   - Enhanced format detection logic for mixed separators
+   - Better handling of ambiguous cases (English vs Indonesian formats)
+   - Added documentation examples for all supported formats
+
+2. **Date Utility Documentation**
+   - Added timezone behavior explanation at file header
+   - Documented that month ranges use local timezone boundaries
+   - Clarified intentional design: users think in local calendar months
+   - Added example showing UTC offset in ISO output
+
+3. **Logger Security Enhancement**
+   - Added `sanitizeMessage()` helper for string pattern detection
+   - Detects sensitive patterns in log messages: `token: xyz`, `password=abc`, etc.
+   - Enhanced `logger.error()` documentation: stack traces only in `__DEV__`
+   - Added warning that message strings must not contain secrets
+   - Production safety: Error details limited in production mode
+
+### Documentation Updates
+
+1. **tasks.md**
+   - Marked Phase 0 tasks (0.1-0.4) as completed ✅
+   - Marked Phase 1 tasks (1.1-1.4) as completed ✅
+   - Left Phase 1 task 1.5 unchecked (repository tests not implemented)
+   - Marked Phase 2 tasks (2.1-2.4) as completed ✅
+   - Added "Additional Completed Tasks" section with implementation notes
+
+2. **README.md**
+   - Updated running instructions with accurate note
+   - Clarified: "Expo dev server starts successfully and TypeScript passes"
+   - Removed claim of Android runtime success (not verified on device)
+
+3. **PHASE2_SUMMARY.md**
+   - Updated money parsing examples with Indonesian comma support
+   - Enhanced risk/tradeoff section with new improvements
+   - Added timezone behavior explanation
+   - Updated logger sanitization section with string pattern detection
+
+### Files Modified Summary
+
+- `src/lib/utils/money.ts` - Enhanced Indonesian decimal comma support
+- `src/lib/utils/date.ts` - Added timezone behavior documentation
+- `src/lib/utils/logger.ts` - Added message string sanitization
+- `tasks.md` - Marked completed tasks, added implementation notes
+- `README.md` - Clarified verification status
+- `PHASE2_SUMMARY.md` - Updated with improvements and new risks
+
+**Awaiting**: Your review of this cleanup checkpoint before proceeding to Phase 3

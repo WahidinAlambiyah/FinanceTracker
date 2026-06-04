@@ -70,6 +70,11 @@ An offline-first mobile financial tracking application built with Expo React Nat
 npm start
 ```
 
+Or use a specific port:
+```bash
+npx expo start --port 8082
+```
+
 ### Run on Android
 ```bash
 npm run android
@@ -84,6 +89,8 @@ npm run ios
 ```bash
 npm run web
 ```
+
+**Note**: The Expo dev server has been verified to start successfully and TypeScript compilation passes. Full Android runtime verification requires testing on a physical device or emulator.
 
 ## Project Structure
 

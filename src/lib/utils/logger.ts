@@ -4,10 +4,16 @@
  * Provides logging functions that automatically sanitize sensitive data.
  * 
  * Security Rules:
- * - NEVER log passwords, tokens, auth sessions
+ * - NEVER log passwords, tokens, auth sessions in object fields
  * - NEVER log full financial payloads in production
+ * - WARNING: Log MESSAGE STRINGS must not contain secrets either!
  * - Sanitize objects before logging
  * - Use log levels appropriately
+ * 
+ * IMPORTANT: This utility sanitizes OBJECT FIELDS, not message strings.
+ * Example:
+ *   ✅ GOOD: logger.info('User authenticated', { userId: '123' })
+ *   ❌ BAD:  logger.info(`Token: ${token}`) // Token exposed in message!
  * 
  * In production, consider disabling debug/info logs or sending to crash reporting service.
  */
@@ -35,6 +41,40 @@ const SENSITIVE_FIELDS = [
   'cookie',
   'authorization',
 ];
+
+/**
+ * Patterns to detect in strings that might contain sensitive data
+ */
+const SENSITIVE_PATTERNS = [
+  /\btoken[:\s=]+[a-zA-Z0-9_\-\.]+/gi,
+  /\bpassword[:\s=]+\S+/gi,
+  /\bapikey[:\s=]+[a-zA-Z0-9_\-]+/gi,
+  /\bsecret[:\s=]+[a-zA-Z0-9_\-]+/gi,
+  /\bauthorization[:\s]+bearer\s+\S+/gi,
+];
+
+/**
+ * Sanitize a string message by redacting potential sensitive patterns
+ * 
+ * @param message - String message to sanitize
+ * @returns Sanitized message
+ */
+function sanitizeMessage(message: string): string {
+  if (typeof message !== 'string') {
+    return message;
+  }
+  
+  let sanitized = message;
+  
+  for (const pattern of SENSITIVE_PATTERNS) {
+    sanitized = sanitized.replace(pattern, (match) => {
+      const parts = match.split(/[:\s=]+/);
+      return parts[0] + ': [REDACTED]';
+    });
+  }
+  
+  return sanitized;
+}
 
 /**
  * Sanitize an object by removing sensitive fields
@@ -95,7 +135,8 @@ function sanitizeObject(obj: any): any {
  */
 function formatMessage(level: string, message: string): string {
   const timestamp = new Date().toISOString();
-  return `[${timestamp}] [${level}] ${message}`;
+  const sanitized = sanitizeMessage(message);
+  return `[${timestamp}] [${level}] ${sanitized}`;
 }
 
 /**
@@ -168,6 +209,9 @@ export function warn(message: string, data?: any): void {
  * Use for error conditions that need attention.
  * Errors are always logged, even in production.
  * 
+ * PRODUCTION SAFETY: Stack traces are only logged in development.
+ * In production, only the error message is logged to avoid exposing sensitive details.
+ * 
  * @param message - Error message
  * @param error - Error object or data (will be sanitized)
  * 
@@ -180,12 +224,13 @@ export function warn(message: string, data?: any): void {
 export function error(message: string, error?: any): void {
   console.error(formatMessage('ERROR', message));
   if (error !== undefined) {
-    // For Error objects, log stack trace if available
+    // For Error objects, log stack trace ONLY in development
     if (error instanceof Error) {
       console.error(error.message);
       if (error.stack && __DEV__) {
         console.error(error.stack);
       }
+      // In production, do NOT log stack trace (may contain sensitive file paths)
     } else {
       console.error(sanitizeObject(error));
     }

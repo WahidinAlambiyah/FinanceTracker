@@ -4,6 +4,16 @@
  * Provides date handling functions for the offline-first finance tracker.
  * All dates are stored as ISO 8601 strings in SQLite for consistency and timezone safety.
  * 
+ * TIMEZONE BEHAVIOR:
+ * - ISO timestamps are stored in UTC (with 'Z' suffix)
+ * - Month ranges use local timezone boundaries (user's calendar month)
+ * - Display functions use local timezone (Intl.DateTimeFormat)
+ * - This is intentional: users think in local time, but storage is UTC-based
+ * 
+ * Example: User in Jakarta (UTC+7) creates transaction "today"
+ * - Transaction date stored as: "2024-06-04T00:00:00.000+07:00" (or UTC equivalent)
+ * - Month range for June 2024: June 1 00:00 local to June 30 23:59 local (converted to ISO)
+ * 
  * Uses native JavaScript Date and Intl APIs - no external dependencies needed.
  */
 
@@ -72,20 +82,27 @@ export function fromISOString(isoString: string): Date | null {
 /**
  * Get the start and end ISO timestamps for a given month
  * 
+ * IMPORTANT: Returns ISO timestamps based on LOCAL TIMEZONE month boundaries.
+ * This is intentional - users think in their local calendar month.
+ * 
  * Useful for querying transactions within a specific month.
- * Times are set to start of day (00:00:00.000) and end of day (23:59:59.999).
+ * Times are set to start of day (00:00:00.000) and end of day (23:59:59.999) in local time,
+ * then converted to ISO (which may show UTC offset depending on timezone).
  * 
  * @param year - Full year (e.g., 2024)
  * @param month - Month (1-12, where 1 is January)
- * @returns Object with startDate and endDate as ISO strings
+ * @returns Object with startDate and endDate as ISO strings (local month boundaries)
  * 
  * @example
  * ```typescript
- * const range = getMonthRange(2024, 6); // June 2024
+ * // User in Jakarta (UTC+7):
+ * const range = getMonthRange(2024, 6); // June 2024 LOCAL
  * // {
- * //   startDate: "2024-06-01T00:00:00.000Z",
- * //   endDate: "2024-06-30T23:59:59.999Z"
+ * //   startDate: "2024-05-31T17:00:00.000Z" (June 1, 00:00 Jakarta time)
+ * //   endDate: "2024-06-30T16:59:59.999Z" (June 30, 23:59 Jakarta time)
  * // }
+ * 
+ * // Use these timestamps to query SQLite for "June transactions" in user's local context
  * ```
  */
 export function getMonthRange(year: number, month: number): {
