@@ -1,7 +1,13 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useEffect, useState } from 'react';
-import { getExecutedMigrations, isDatabaseOpen } from '../lib/db';
+import { getDatabase, getExecutedMigrations, isDatabaseOpen } from '../lib/db';
 
+/**
+ * Home Screen - Phase 1 Development Screen
+ * 
+ * NOTE: This is a temporary development screen showing database status.
+ * This will be replaced by the actual Dashboard screen in Phase 7.
+ */
 export default function HomeScreen() {
   const [migrations, setMigrations] = useState<{ name: string; executed_at: string }[]>([]);
   const [dbStatus, setDbStatus] = useState<string>('Checking...');
@@ -10,9 +16,8 @@ export default function HomeScreen() {
     async function loadDbInfo() {
       if (isDatabaseOpen()) {
         setDbStatus('Connected');
-        const executedMigrations = await getExecutedMigrations(
-          (await import('../lib/db')).getDatabase()
-        );
+        const db = getDatabase();
+        const executedMigrations = await getExecutedMigrations(db);
         setMigrations(executedMigrations);
       } else {
         setDbStatus('Not connected');

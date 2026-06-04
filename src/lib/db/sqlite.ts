@@ -5,6 +5,16 @@
  * for the offline-first Finance Tracker app.
  * 
  * Uses Expo SQLite SDK 56 async API.
+ * 
+ * IMPORTANT: This module only manages the database connection.
+ * For executing queries with user data, repositories MUST use parameterized APIs:
+ * - runAsync(sql, ...params) for write operations
+ * - getFirstAsync<T>(sql, ...params) for single row reads
+ * - getAllAsync<T>(sql, ...params) for multi-row reads
+ * - prepareAsync(sql) for prepared statements
+ * 
+ * NEVER use execAsync() with user-provided values - it's unsafe.
+ * execAsync() is only acceptable for static SQL like PRAGMA and schema migrations.
  */
 
 import * as SQLite from 'expo-sqlite';

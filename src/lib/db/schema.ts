@@ -8,6 +8,16 @@
  * - Money amounts are INTEGER (Rupiah minor units)
  * - Soft deletes via deleted_at
  * - Sync status tracking
+ * 
+ * IMPORTANT: These schema definitions use only static SQL.
+ * This SQL is executed via execAsync() during migrations.
+ * 
+ * For runtime queries with user data, repositories MUST use:
+ * - runAsync() with parameterized queries
+ * - prepareAsync() for prepared statements
+ * - getFirstAsync() / getAllAsync() with parameters
+ * 
+ * NEVER use execAsync() with user-provided values.
  */
 
 export const INITIAL_SCHEMA = `

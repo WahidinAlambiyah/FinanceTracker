@@ -77,6 +77,11 @@ async function initializeMigrationsTable(db: SQLite.SQLiteDatabase): Promise<voi
  * Run all pending migrations
  * This is idempotent - safe to call multiple times
  * 
+ * Each migration is wrapped in an exclusive transaction to ensure:
+ * - Schema changes and migration recording happen atomically
+ * - No partial migration state if recording fails
+ * - No async queries can interrupt the transaction
+ * 
  * @param db - The database instance
  * @throws Error if any migration fails
  */
@@ -92,11 +97,21 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
       console.log(`Running migration: ${migration.name}`);
       
       try {
-        // Execute the migration SQL
-        await db.execAsync(migration.sql);
-        
-        // Record successful execution
-        await recordMigration(db, migration.name);
+        // Wrap migration execution and recording in an exclusive transaction
+        // This ensures atomicity - either both succeed or both fail
+        await db.withExclusiveTransactionAsync(async (txn) => {
+          // Execute the migration SQL within the transaction
+          // execAsync is safe here because migration.sql contains only static schema DDL
+          await txn.execAsync(migration.sql);
+          
+          // Record successful execution within the same transaction
+          const executedAt = new Date().toISOString();
+          await txn.runAsync(
+            'INSERT INTO migrations (name, executed_at) VALUES (?, ?)',
+            migration.name,
+            executedAt
+          );
+        });
         
         console.log(`✓ Migration completed: ${migration.name}`);
       } catch (error) {

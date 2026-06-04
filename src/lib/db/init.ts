@@ -27,19 +27,22 @@ export async function initializeDatabase(): Promise<InitResult> {
     const db = await openDatabase();
     console.log('✓ Database opened');
     
-    // Step 2: Run migrations
+    // Step 2: Run migrations (wrapped in exclusive transactions)
     await runMigrations(db);
     console.log('✓ Migrations completed');
     
     console.log('Database initialization complete');
     return { success: true };
   } catch (error) {
+    // Log technical error for debugging
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Database initialization failed:', errorMessage);
+    console.error('Full error:', error);
     
+    // Return generic error for user display
     return {
       success: false,
-      error: errorMessage,
+      error: 'Failed to initialize local database',
     };
   }
 }

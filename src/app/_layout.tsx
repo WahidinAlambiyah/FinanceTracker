@@ -36,8 +36,9 @@ export default function RootLayout() {
     return (
       <View style={styles.container}>
         <Text style={styles.errorTitle}>Database Error</Text>
-        <Text style={styles.errorMessage}>{initError}</Text>
-        <Text style={styles.errorHint}>Please restart the app</Text>
+        <Text style={styles.errorMessage}>
+          Failed to initialize local database. Please restart the app.
+        </Text>
       </View>
     );
   }
@@ -74,10 +75,5 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 8,
-  },
-  errorHint: {
-    fontSize: 14,
-    color: '#999',
-    fontStyle: 'italic',
   },
 });
