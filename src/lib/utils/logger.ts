@@ -209,8 +209,10 @@ export function warn(message: string, data?: any): void {
  * Use for error conditions that need attention.
  * Errors are always logged, even in production.
  * 
- * PRODUCTION SAFETY: Stack traces are only logged in development.
- * In production, only the error message is logged to avoid exposing sensitive details.
+ * PRODUCTION SAFETY: 
+ * - Error messages are sanitized to remove potential secrets
+ * - Stack traces are only logged in development
+ * - In production, only sanitized error message is logged
  * 
  * @param message - Error message
  * @param error - Error object or data (will be sanitized)
@@ -224,13 +226,18 @@ export function warn(message: string, data?: any): void {
 export function error(message: string, error?: any): void {
   console.error(formatMessage('ERROR', message));
   if (error !== undefined) {
-    // For Error objects, log stack trace ONLY in development
+    // For Error objects, sanitize message and stack trace
     if (error instanceof Error) {
-      console.error(error.message);
+      // Sanitize error message before logging (may contain tokens/secrets)
+      const sanitizedMessage = sanitizeMessage(error.message);
+      console.error(sanitizedMessage);
+      
+      // Stack traces only in development, and sanitized
       if (error.stack && __DEV__) {
-        console.error(error.stack);
+        const sanitizedStack = sanitizeMessage(error.stack);
+        console.error(sanitizedStack);
       }
-      // In production, do NOT log stack trace (may contain sensitive file paths)
+      // In production, do NOT log stack trace (may contain sensitive file paths/data)
     } else {
       console.error(sanitizeObject(error));
     }

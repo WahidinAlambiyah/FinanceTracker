@@ -151,6 +151,21 @@
   - `logger.financial()` restricts logged fields to safe metadata only
   - Stack traces only logged in development mode (`__DEV__`)
 
+### Pre-Phase 3 Checkpoint
+
+- **Logger Error Safety Enhancement**
+  - `logger.error()` now sanitizes `error.message` before logging
+  - Stack traces are sanitized before logging in development mode
+  - Production logging never exposes tokens, passwords, auth sessions, or secrets
+  - Both object fields and string content are protected
+
+- **AI/Developer Consistency Guide Created**
+  - Created `AGENTS.md` as authoritative guide for Kiro AI, future AI agents, and human developers
+  - Documents project mission, architecture rules, code organization, dependencies, security, and UI/UX design system
+  - Establishes blue-based color palette and consistent component design
+  - Defines phase discipline and documentation requirements
+  - Ensures all contributors maintain architectural consistency
+
 ---
 
 ## Phase 3 — Authentication
