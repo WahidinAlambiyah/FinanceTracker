@@ -170,38 +170,38 @@
 
 ## Phase 3 — Authentication
 
-- [ ] 3.1 Setup Supabase client
+- [x] 3.1 Setup Supabase client
   - Create `src/lib/supabase/supabase.ts`.
   - Configure Supabase URL and anon key.
   - Requirements: REQ-AUTH-001, REQ-AUTH-002
 
-- [ ] 3.2 Implement secure session storage
+- [x] 3.2 Implement secure session storage
   - Use secure storage for auth session.
   - Do not store tokens in plain text.
   - Requirements: REQ-SEC-002
 
-- [ ] 3.3 Create auth service
+- [x] 3.3 Create auth service
   - Implement register.
   - Implement login.
   - Implement logout.
   - Implement get current session.
   - Requirements: REQ-AUTH-001, REQ-AUTH-002, REQ-AUTH-003
 
-- [ ] 3.4 Create login screen
+- [x] 3.4 Create login screen
   - Email input.
   - Password input.
   - Submit button.
   - Register link.
   - Safe error message.
 
-- [ ] 3.5 Create register screen
+- [x] 3.5 Create register screen
   - Email input.
   - Password input.
   - Confirm password input.
   - Submit button.
   - Login link.
 
-- [ ] 3.6 Implement protected navigation
+- [x] 3.6 Implement protected navigation
   - Redirect unauthenticated users to login.
   - Allow authenticated users to access tabs.
   - Requirements: REQ-AUTH-004

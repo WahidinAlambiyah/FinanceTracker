@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { initializeDatabase } from '../lib/db';
+import { AuthProvider } from '../features/auth';
 
 export default function RootLayout() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -25,8 +26,8 @@ export default function RootLayout() {
   if (!isInitialized && !initError) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#4CAF50" />
-        <Text style={styles.loadingText}>Initializing database...</Text>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={styles.loadingText}>Initializing app...</Text>
       </View>
     );
   }
@@ -35,7 +36,7 @@ export default function RootLayout() {
   if (initError) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorTitle}>Database Error</Text>
+        <Text style={styles.errorTitle}>Initialization Error</Text>
         <Text style={styles.errorMessage}>
           Failed to initialize local database. Please restart the app.
         </Text>
@@ -43,11 +44,19 @@ export default function RootLayout() {
     );
   }
 
-  // Database is ready, show normal app
+  // Database is ready, wrap app with auth provider
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ title: 'Finance Tracker' }} />
-    </Stack>
+    <AuthProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </AuthProvider>
   );
 }
 
@@ -56,23 +65,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F8FAFC',
     padding: 20,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
+    color: '#64748B',
   },
   errorTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#f44336',
+    color: '#DC2626',
     marginBottom: 12,
   },
   errorMessage: {
     fontSize: 16,
-    color: '#666',
+    color: '#64748B',
     textAlign: 'center',
     marginBottom: 8,
   },
