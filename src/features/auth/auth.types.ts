@@ -4,17 +4,17 @@
  * TypeScript interfaces for authentication-related data structures.
  */
 
-import { Session, User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 
 /**
  * Auth session from Supabase
- * Re-export for convenience
+ * Re-export Supabase Session type directly to avoid drift
  */
 export type AuthSession = Session;
 
 /**
  * Auth user from Supabase
- * Re-export for convenience
+ * Re-export Supabase User type directly
  */
 export type AuthUser = User;
 
@@ -57,10 +57,10 @@ export interface AuthState {
  * Auth context actions
  */
 export interface AuthActions {
-  signIn: (credentials: LoginCredentials) => Promise<AuthResponse<AuthSession>>;
-  signUp: (credentials: RegisterCredentials) => Promise<AuthResponse<AuthSession>>;
+  signIn: (credentials: LoginCredentials) => Promise<AuthResponse<Session>>;
+  signUp: (credentials: RegisterCredentials) => Promise<AuthResponse<Session>>;
   signOut: () => Promise<AuthResponse>;
-  refreshSession: () => Promise<AuthResponse<AuthSession>>;
+  refreshSession: () => Promise<AuthResponse<Session>>;
 }
 
 /**

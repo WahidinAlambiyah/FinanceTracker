@@ -11,6 +11,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 import * as authService from './auth.service';
@@ -20,7 +21,6 @@ import type {
   LoginCredentials,
   RegisterCredentials,
   AuthResponse,
-  AuthSession,
 } from './auth.types';
 
 /**
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   /**
    * Update auth state
    */
-  const updateState = useCallback((session: AuthSession | null) => {
+  const updateState = useCallback((session: Session | null) => {
     setState({
       user: session?.user ?? null,
       session,
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logger.debug('Setting up auth state listener');
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         logger.debug('Auth state changed', { event });
 
         switch (event) {
@@ -143,7 +143,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Sign in with email and password
    */
   const signIn = useCallback(
-    async (credentials: LoginCredentials): Promise<AuthResponse<AuthSession>> => {
+    async (credentials: LoginCredentials): Promise<AuthResponse<Session>> => {
       const result = await authService.login(credentials);
       
       if (result.data) {
@@ -159,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Register new user
    */
   const signUp = useCallback(
-    async (credentials: RegisterCredentials): Promise<AuthResponse<AuthSession>> => {
+    async (credentials: RegisterCredentials): Promise<AuthResponse<Session>> => {
       const result = await authService.register(credentials);
       
       if (result.data) {
@@ -188,7 +188,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * Refresh current session
    */
   const refreshSession = useCallback(
-    async (): Promise<AuthResponse<AuthSession>> => {
+    async (): Promise<AuthResponse<Session>> => {
       const session = await authService.refreshSession();
       
       if (session) {

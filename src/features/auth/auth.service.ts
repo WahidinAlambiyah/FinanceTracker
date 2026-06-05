@@ -10,14 +10,13 @@
  * - Error messages sanitized for users
  */
 
+import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
 import { logger } from '@/lib/utils/logger';
 import type {
   LoginCredentials,
   RegisterCredentials,
   AuthResponse,
-  AuthSession,
-  AuthUser,
 } from './auth.types';
 
 /**
@@ -81,7 +80,7 @@ function mapAuthError(error: any): string {
  */
 export async function register(
   credentials: RegisterCredentials
-): Promise<AuthResponse<AuthSession>> {
+): Promise<AuthResponse<Session>> {
   try {
     logger.info('User registration attempt');
 
@@ -124,7 +123,7 @@ export async function register(
  */
 export async function login(
   credentials: LoginCredentials
-): Promise<AuthResponse<AuthSession>> {
+): Promise<AuthResponse<Session>> {
   try {
     logger.info('User login attempt');
 
@@ -191,7 +190,7 @@ export async function logout(): Promise<AuthResponse> {
  * 
  * Requirements: REQ-AUTH-004
  */
-export async function getCurrentSession(): Promise<AuthSession | null> {
+export async function getCurrentSession(): Promise<Session | null> {
   try {
     const { data, error } = await supabase.auth.getSession();
 
@@ -224,7 +223,7 @@ export async function getCurrentSession(): Promise<AuthSession | null> {
  * 
  * @returns Current user or null
  */
-export async function getCurrentUser(): Promise<AuthUser | null> {
+export async function getCurrentUser(): Promise<User | null> {
   try {
     const { data, error } = await supabase.auth.getUser();
 
@@ -247,7 +246,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
  * 
  * @returns Refreshed session or null
  */
-export async function refreshSession(): Promise<AuthSession | null> {
+export async function refreshSession(): Promise<Session | null> {
   try {
     const { data, error } = await supabase.auth.refreshSession();
 
