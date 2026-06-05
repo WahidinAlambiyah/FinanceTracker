@@ -12,7 +12,7 @@ Phase 5 implements category management with idempotent default category seeding.
 
 ---
 
-## Seeding Trigger Fix Applied
+## Seeding Trigger Fix Applied ✅
 
 ### Issue
 Initial implementation gated seeding with `getCategoryCount() === 0`, which broke partial-seed recovery.
@@ -25,22 +25,41 @@ Initial implementation gated seeding with `getCategoryCount() === 0`, which brok
 5. Seeder skipped → missing defaults never inserted
 
 ### Fix Applied
-Removed count gate and always call seeder on first category screen load:
+**Changes:**
+1. Removed `getCategoryCount()` gate from `checkAndSeedDefaults()`
+2. Removed unused `getCategoryCount` import
+3. Seeder now always runs on first category screen load
+
+**Implementation:**
 ```typescript
-async function checkAndSeedDefaults() {
-  setIsSeeding(true);
-  const seedResult = await seedDefaultCategories(user.id);
-  // Seeder is idempotent - inserts only missing defaults
-}
+const checkAndSeedDefaults = useCallback(async () => {
+  if (!user) return;
+
+  try {
+    setIsSeeding(true);
+    const seedResult = await seedDefaultCategories(user.id);
+    // Seeder is idempotent - inserts only missing defaults
+    
+    if (!seedResult.success) {
+      Alert.alert('Warning', 'Failed to load default categories...');
+    }
+  } catch (error) {
+    logger.error('Seeding check failed', error);
+    Alert.alert('Warning', 'Failed to load default categories...');
+  } finally {
+    setIsSeeding(false);
+  }
+}, [user]);
 ```
 
-### Result
+### Result ✅
 - Seeder always runs on first load
 - Seeder checks each default individually
 - Existing defaults → skipped
 - Missing defaults → inserted
 - Sync queue items ONLY for newly inserted defaults
 - Partial-seed recovery works correctly
+- Used `logger.error()` instead of `console.error()`
 
 ---
 

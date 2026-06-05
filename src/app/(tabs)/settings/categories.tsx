@@ -23,7 +23,6 @@ import { useAuth } from '@/features/auth';
 import { logger } from '@/lib/utils/logger';
 import {
   getCategories,
-  getCategoryCount,
   createCategory,
   updateCategory,
   deleteCategory,
