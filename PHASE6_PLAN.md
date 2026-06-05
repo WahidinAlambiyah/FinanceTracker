@@ -701,13 +701,15 @@ findByUserIdAndMonth(userId: string, year: number, month: number): Promise<Trans
 
 /**
  * Find transactions by wallet ID
+ * Note: Still filter by userId for user isolation
  */
-findByWalletId(walletId: string, limit?: number): Promise<Transaction[]>
+findByWalletId(userId: string, walletId: string, limit?: number): Promise<Transaction[]>
 
 /**
  * Find transactions by category ID
+ * Note: Still filter by userId for user isolation
  */
-findByCategoryId(categoryId: string, limit?: number): Promise<Transaction[]>
+findByCategoryId(userId: string, categoryId: string, limit?: number): Promise<Transaction[]>
 
 /**
  * Find transactions by type (income/expense/transfer)
@@ -778,13 +780,13 @@ async create(transaction: Transaction): Promise<void> {
 }
 ```
 
-**Find by Month (with date range):**
+**Find by Month (with date range using existing utility):**
 ```typescript
+import { getMonthRange } from '@/lib/utils/date';
+
 async findByUserIdAndMonth(userId: string, year: number, month: number): Promise<Transaction[]> {
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`;
-  const endDate = month === 12 
-    ? `${year + 1}-01-01T00:00:00.000Z`
-    : `${year}-${String(month + 1).padStart(2, '0')}-01T00:00:00.000Z`;
+  // Use existing date utility for local timezone month boundaries
+  const { startDate, endDate } = getMonthRange(year, month);
 
   return await this.db.getAllAsync<Transaction>(
     `SELECT * FROM transactions 
@@ -798,13 +800,13 @@ async findByUserIdAndMonth(userId: string, year: number, month: number): Promise
 }
 ```
 
-**Monthly Income Total (aggregation):**
+**Monthly Income Total (aggregation using existing utility):**
 ```typescript
+import { getMonthRange } from '@/lib/utils/date';
+
 async getMonthlyIncomeTotal(userId: string, year: number, month: number): Promise<number> {
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`;
-  const endDate = month === 12 
-    ? `${year + 1}-01-01T00:00:00.000Z`
-    : `${year}-${String(month + 1).padStart(2, '0')}-01T00:00:00.000Z`;
+  // Use existing date utility for local timezone month boundaries
+  const { startDate, endDate } = getMonthRange(year, month);
 
   const result = await this.db.getFirstAsync<{ total: number }>(
     `SELECT COALESCE(SUM(amount), 0) as total 
@@ -1080,10 +1082,39 @@ const { data: wallets } = await getWallets(userId);
 - Button: "Create Wallet" → navigate to `/wallets/new`
 - Do NOT allow transaction creation without wallet
 
-**Selection UI (Simple Approach):**
-- Option A: React Native `Picker` component (built-in, no dependency)
-- Option B: Modal with FlatList of wallet cards (tap to select)
+**Selection UI (Modal with FlatList):**
+- Use Modal + FlatList + TouchableOpacity (built-in components, no dependency)
+- Display wallet cards in modal
+- Tap to select
 - Display: wallet name + type (e.g., "Cash Wallet (cash)")
+
+**Example:**
+```typescript
+import { Modal, FlatList, TouchableOpacity, Text, View } from 'react-native';
+
+<TouchableOpacity onPress={() => setShowWalletModal(true)}>
+  <Text>{selectedWallet?.name || 'Select wallet...'}</Text>
+</TouchableOpacity>
+
+<Modal visible={showWalletModal} animationType="slide">
+  <View>
+    <FlatList
+      data={wallets}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <TouchableOpacity 
+          onPress={() => {
+            setSelectedWalletId(item.id);
+            setShowWalletModal(false);
+          }}
+        >
+          <Text>{item.name} ({item.type})</Text>
+        </TouchableOpacity>
+      )}
+    />
+  </View>
+</Modal>
+```
 
 **For Transfer - Destination Wallet:**
 - Load all user's wallets
@@ -1108,7 +1139,7 @@ const { data: expenseCategories } = await getCategories(userId, 'expense');
 - User must manage categories manually first
 
 **Selection UI:**
-- React Native `Picker` or modal with FlatList
+- Modal with FlatList (same pattern as wallet selector)
 - Display: category name + icon (text) + color (circle)
 - Default categories shown first (order by `is_default DESC, name ASC`)
 
@@ -1403,15 +1434,15 @@ Add your first transaction to start tracking your finances
 **2. Dynamic Form Fields**
 
 **Income/Expense Form:**
-- Wallet selector (Picker/modal, required)
-- Category selector (Picker/modal, required, filtered by type)
+- Wallet selector (Modal with FlatList, required)
+- Category selector (Modal with FlatList, required, filtered by type)
 - Amount input (TextInput, numeric keyboard, required)
 - Date input (default: current timestamp, editable)
 - Note input (TextInput, multiline, optional)
 
 **Transfer Form:**
-- Source wallet selector (Picker/modal, required)
-- Destination wallet selector (Picker/modal, required, excludes source)
+- Source wallet selector (Modal with FlatList, required)
+- Destination wallet selector (Modal with FlatList, required, excludes source)
 - Amount input (TextInput, numeric keyboard, required)
 - Date input (default: current timestamp, editable)
 - Note input (TextInput, multiline, optional)
@@ -1857,7 +1888,7 @@ async function calculateWalletBalance(walletId: string): Promise<number> {
 - Edit transaction screen (type read-only)
 - Monthly income/expense/net cashflow summary
 - Month navigation (prev/next month)
-- Wallet/category selection (simple Picker or modal)
+- Wallet/category selection (Modal with FlatList selector)
 - Transfer flow (source/destination wallet, same-wallet prevention)
 - Sync queue integration (add items, no processing)
 - Simple date input (default current timestamp)
@@ -1930,7 +1961,7 @@ async function calculateWalletBalance(walletId: string): Promise<number> {
 - [ ] Create `transactions/new.tsx`
 - [ ] Implement type selector (Income/Expense/Transfer)
 - [ ] Implement dynamic form fields
-- [ ] Implement wallet/category selection (simple Picker)
+- [ ] Implement wallet/category selection (Modal with FlatList)
 - [ ] Implement amount input (INTEGER validation)
 - [ ] Implement simple date input (default current)
 - [ ] Implement note input
