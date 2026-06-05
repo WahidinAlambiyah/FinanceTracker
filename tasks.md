@@ -212,13 +212,13 @@
 
 ## Phase 4 — Wallet Management
 
-- [ ] 4.1 Create wallet model and validation schema
+- [x] 4.1 Create wallet model and validation schema
   - Create wallet type.
   - Validate name.
   - Validate wallet type.
   - Validate opening balance.
 
-- [ ] 4.2 Create wallet repository
+- [x] 4.2 Create wallet repository
   - Create wallet.
   - Update wallet.
   - Soft delete wallet.
@@ -226,33 +226,35 @@
   - Get wallet by ID.
   - Requirements: REQ-WALLET-001, REQ-WALLET-002, REQ-WALLET-003
 
-- [ ] 4.3 Create wallet service
+- [x] 4.3 Create wallet service
   - Save wallet locally.
   - Add sync queue item after create/update/delete.
   - Requirements: REQ-SYNC-001
 
-- [ ] 4.4 Create wallets screen
+- [x] 4.4 Create wallets screen
   - Show wallet list.
   - Show empty state.
   - Show add wallet button.
   - Requirements: REQ-WALLET-001
 
-- [ ] 4.5 Create add wallet screen
+- [x] 4.5 Create add wallet screen
   - Wallet name.
   - Wallet type.
   - Opening balance.
   - Save button.
 
-- [ ] 4.6 Create edit wallet screen
+- [x] 4.6 Create edit wallet screen
   - Load wallet by ID.
   - Edit wallet.
   - Soft delete wallet.
 
-- [ ] 4.7 Add wallet tests
+- [ ] 4.7 Add wallet tests (Deferred to Phase 13)
   - Create wallet.
   - Update wallet.
   - Soft delete wallet.
   - Queue sync item.
+
+**Phase 4 Status**: Implementation complete. Manual testing checklist available in `PHASE4_SUMMARY.md`.
 
 ---
 
