@@ -86,6 +86,22 @@ These rules **MUST NOT** be violated. They are foundational to the offline-first
   - Advanced conflict resolution UI
 - Keep MVP **simple, stable, and complete**.
 
+### 10. Supabase Custom Schema for Application Tables
+
+- **All application tables use custom schema**: `financetracker`
+- **Supabase Auth remains in default**: `auth.users` (managed by Supabase)
+- **Future table structure** (Phase 9+):
+  - `financetracker.profiles`
+  - `financetracker.wallets`
+  - `financetracker.categories`
+  - `financetracker.transactions`
+- **Benefits**:
+  - Clean separation from Supabase managed tables
+  - Easier migrations and schema management
+  - Clear ownership and namespace isolation
+- **Implementation**: Phase 9 (Supabase Remote Schema and RLS)
+- **Current Phase**: Not yet implemented (Phase 3 complete - local auth only)
+
 ---
 
 ## Code Organization Rules

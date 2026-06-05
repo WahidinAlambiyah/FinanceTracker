@@ -337,17 +337,41 @@ Run to verify all types are correct:
 npx tsc --noEmit
 ```
 
-Expected: ✅ No errors
+**Result**: ✅ No errors (verified after tsconfig.json path alias fix)
+
+**TypeScript Configuration Journey:**
+1. Initial implementation used `@/*` path alias for imports
+2. Added `baseUrl: "."` and `paths` to tsconfig.json
+3. TypeScript 6.0 deprecated `baseUrl` → Removed it
+4. TypeScript required relative paths without `baseUrl` → Changed to `"./src/*"`
+5. Final working config:
+   ```json
+   {
+     "extends": "expo/tsconfig.base",
+     "compilerOptions": {
+       "strict": true,
+       "paths": {
+         "@/*": ["./src/*"]
+       }
+     }
+   }
+   ```
 
 ## Expo Start
 
 Run to verify app compiles:
 
 ```bash
-npx expo start --port 8082
+npx expo start --dev-client
 ```
 
-Expected: ✅ Server starts successfully, no compilation errors
+**Result**: ✅ Server starts successfully
+- Database initialization works
+- Auth listener starts
+- No compilation errors
+- Path aliases resolve correctly at runtime
+
+**Note**: Full Android feature testing (login, register, navigation) requires manual testing on physical device or emulator. Expo dev server startup verification only confirms compilation and initialization.
 
 ## Risks and Tradeoffs
 

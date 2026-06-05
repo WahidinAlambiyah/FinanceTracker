@@ -434,10 +434,21 @@ CREATE TABLE IF NOT EXISTS sync_metadata (
 
 ## 9. Supabase Server Schema
 
+**Schema Organization:**
+- All application tables use custom schema: `financetracker`
+- Supabase Auth tables remain in default `auth` schema (managed by Supabase)
+- Benefits: Clean separation, easier migrations, clear namespace isolation
+
+**Implementation Phase:** Phase 9 (Supabase Remote Schema and RLS)
+
+**Note:** The following schema definitions are for Phase 9+ implementation. Phase 3 (current) implements authentication only, using Supabase Auth (`auth.users`) without custom application tables.
+
 ## 9.1 profiles
 
 ```sql
-CREATE TABLE IF NOT EXISTS public.profiles (
+CREATE SCHEMA IF NOT EXISTS financetracker;
+
+CREATE TABLE IF NOT EXISTS financetracker.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email text NOT NULL,
   display_name text,
@@ -450,7 +461,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 ## 9.2 wallets
 
 ```sql
-CREATE TABLE IF NOT EXISTS public.wallets (
+CREATE TABLE IF NOT EXISTS financetracker.wallets (
   id uuid PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name text NOT NULL,
@@ -465,7 +476,7 @@ CREATE TABLE IF NOT EXISTS public.wallets (
 ## 9.3 categories
 
 ```sql
-CREATE TABLE IF NOT EXISTS public.categories (
+CREATE TABLE IF NOT EXISTS financetracker.categories (
   id uuid PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name text NOT NULL,
@@ -482,13 +493,13 @@ CREATE TABLE IF NOT EXISTS public.categories (
 ## 9.4 transactions
 
 ```sql
-CREATE TABLE IF NOT EXISTS public.transactions (
+CREATE TABLE IF NOT EXISTS financetracker.transactions (
   id uuid PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   type text NOT NULL CHECK (type IN ('income', 'expense', 'transfer')),
-  wallet_id uuid NOT NULL REFERENCES public.wallets(id),
-  destination_wallet_id uuid REFERENCES public.wallets(id),
-  category_id uuid REFERENCES public.categories(id),
+  wallet_id uuid NOT NULL REFERENCES financetracker.wallets(id),
+  destination_wallet_id uuid REFERENCES financetracker.wallets(id),
+  category_id uuid REFERENCES financetracker.categories(id),
   amount bigint NOT NULL CHECK (amount > 0),
   note text,
   transaction_date timestamptz NOT NULL,
@@ -498,43 +509,47 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 );
 ```
 
+**Note:** Foreign key references in `financetracker.transactions` point to `financetracker.wallets` and `financetracker.categories` within the same custom schema.
+
 ## 10. Supabase RLS Policy Design
 
-Enable RLS for:
+**Implementation Phase:** Phase 9 (Supabase Remote Schema and RLS)
 
-- profiles
-- wallets
-- categories
-- transactions
+Enable RLS for all tables in the `financetracker` schema:
+
+- financetracker.profiles
+- financetracker.wallets
+- financetracker.categories
+- financetracker.transactions
 
 Example pattern:
 
 ```sql
-ALTER TABLE public.wallets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financetracker.wallets ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can select own wallets"
-ON public.wallets
+ON financetracker.wallets
 FOR SELECT
 USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert own wallets"
-ON public.wallets
+ON financetracker.wallets
 FOR INSERT
 WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own wallets"
-ON public.wallets
+ON financetracker.wallets
 FOR UPDATE
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own wallets"
-ON public.wallets
+ON financetracker.wallets
 FOR DELETE
 USING (auth.uid() = user_id);
 ```
 
-Repeat similar policies for categories and transactions.
+Repeat similar policies for `financetracker.categories` and `financetracker.transactions`.
 
 ## 11. Sync Design
 
