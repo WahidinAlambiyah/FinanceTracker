@@ -85,6 +85,29 @@ export default function TabsLayout() {
           tabBarIcon: () => null,
         }}
       />
+
+      {/* Hide nested routes from bottom tab bar */}
+      <Tabs.Screen
+        name="wallets/new"
+        options={{
+          href: null,
+          title: 'Add Wallet',
+        }}
+      />
+      <Tabs.Screen
+        name="wallets/[id]"
+        options={{
+          href: null,
+          title: 'Edit Wallet',
+        }}
+      />
+      <Tabs.Screen
+        name="settings/categories"
+        options={{
+          href: null,
+          title: 'Manage Categories',
+        }}
+      />
     </Tabs>
   );
 }

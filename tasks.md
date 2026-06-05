@@ -262,42 +262,43 @@
 
 ## Phase 5 — Category Management
 
-- [ ] 5.1 Create category model and validation schema
-  - Category name.
-  - Category type.
-  - Icon.
-  - Color.
-  - is_default.
+- [x] 5.1 Create category model and validation schema
+  - Create category type.
+  - Validate name.
+  - Validate category type.
+  - Validate icon and color.
 
-- [ ] 5.2 Create category repository
+- [x] 5.2 Create category repository
   - Create category.
   - Update category.
   - Soft delete category.
   - List by type.
   - Requirements: REQ-CATEGORY-001, REQ-CATEGORY-002
 
-- [ ] 5.3 Create default category seeder
+- [x] 5.3 Create default category seeder
   - Seed default income categories.
   - Seed default expense categories.
   - Prevent duplicate default categories.
   - Requirements: REQ-CATEGORY-001
 
-- [ ] 5.4 Create category service
+- [x] 5.4 Create category service
   - Save category locally.
   - Add sync queue item.
   - Requirements: REQ-SYNC-001
 
-- [ ] 5.5 Create category management screen
+- [x] 5.5 Create category management screen
   - List categories by type.
   - Add custom category.
   - Edit category.
   - Soft delete category.
 
-- [ ] 5.6 Add category tests
+- [ ] 5.6 Add category tests (Deferred to Phase 13)
   - Seed defaults.
   - Create custom category.
   - Soft delete category.
   - Queue sync item.
+
+**Phase 5 Status**: Implementation complete. Manual testing checklist available in `PHASE5_SUMMARY.md`.
 
 ---
 

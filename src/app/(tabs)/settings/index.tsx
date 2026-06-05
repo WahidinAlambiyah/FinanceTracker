@@ -81,11 +81,26 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Future Settings Placeholder */}
+        {/* App Settings Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>App Settings</Text>
           
           <View style={styles.card}>
+            {/* Manage Categories Button */}
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => router.push('/settings/categories')}
+            >
+              <View style={styles.settingRowContent}>
+                <Text style={styles.settingLabel}>Manage Categories</Text>
+                <Text style={styles.settingDescription}>Income & expense categories</Text>
+              </View>
+              <Text style={styles.settingChevron}>›</Text>
+            </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            {/* Future Settings Placeholder */}
             <Text style={styles.placeholderText}>
               Additional settings coming in Phase 12:
             </Text>
@@ -159,6 +174,35 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 16,
     color: '#0F172A',
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+  },
+  settingRowContent: {
+    flex: 1,
+  },
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0F172A',
+    marginBottom: 2,
+  },
+  settingDescription: {
+    fontSize: 13,
+    color: '#64748B',
+  },
+  settingChevron: {
+    fontSize: 24,
+    color: '#94A3B8',
+    marginLeft: 8,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#F1F5F9',
+    marginVertical: 8,
   },
   placeholderText: {
     fontSize: 14,
