@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
+import { logger } from '@/lib/utils/logger';
 import {
   getCategories,
   getCategoryCount,
@@ -52,25 +53,30 @@ export default function CategoriesScreen() {
 
   /**
    * Seed default categories if needed
+   * 
+   * Always calls seeder on first load.
+   * Seeder is idempotent: inserts only missing defaults.
+   * Protects against partial-seed failures.
    */
   const checkAndSeedDefaults = useCallback(async () => {
     if (!user) return;
 
     try {
-      const countResult = await getCategoryCount(user.id);
+      setIsSeeding(true);
+      const seedResult = await seedDefaultCategories(user.id);
       
-      if (countResult.success && countResult.data === 0) {
-        // No categories exist, seed defaults
-        setIsSeeding(true);
-        const seedResult = await seedDefaultCategories(user.id);
-        
-        if (!seedResult.success) {
-          Alert.alert('Warning', 'Failed to load default categories. You can still create custom categories.');
-        }
+      if (!seedResult.success) {
+        Alert.alert(
+          'Warning',
+          'Failed to load default categories. You can still create custom categories.'
+        );
       }
     } catch (error) {
-      // Non-blocking error
-      console.error('Seeding check failed', error);
+      logger.error('Seeding check failed', error);
+      Alert.alert(
+        'Warning',
+        'Failed to load default categories. You can still create custom categories.'
+      );
     } finally {
       setIsSeeding(false);
     }

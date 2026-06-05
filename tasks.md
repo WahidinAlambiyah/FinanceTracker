@@ -300,6 +300,8 @@
 
 **Phase 5 Status**: Implementation complete. Manual testing checklist available in `PHASE5_SUMMARY.md`.
 
+**Phase 5 Seeding Trigger Fix Applied**: Initial implementation gated seeding with `getCategoryCount() === 0`, which broke partial-seed recovery. Fix removes count gate and always calls seeder on first load. Seeder is idempotent per-category and inserts only missing defaults.
+
 ---
 
 ## Phase 6 — Transaction Management

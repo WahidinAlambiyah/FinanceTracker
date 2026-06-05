@@ -12,6 +12,38 @@ Phase 5 implements category management with idempotent default category seeding.
 
 ---
 
+## Seeding Trigger Fix Applied
+
+### Issue
+Initial implementation gated seeding with `getCategoryCount() === 0`, which broke partial-seed recovery.
+
+**Failure Case:**
+1. Seeder inserts 3 default categories
+2. App crashes or seeding fails
+3. User reopens category screen
+4. Count is now > 0
+5. Seeder skipped → missing defaults never inserted
+
+### Fix Applied
+Removed count gate and always call seeder on first category screen load:
+```typescript
+async function checkAndSeedDefaults() {
+  setIsSeeding(true);
+  const seedResult = await seedDefaultCategories(user.id);
+  // Seeder is idempotent - inserts only missing defaults
+}
+```
+
+### Result
+- Seeder always runs on first load
+- Seeder checks each default individually
+- Existing defaults → skipped
+- Missing defaults → inserted
+- Sync queue items ONLY for newly inserted defaults
+- Partial-seed recovery works correctly
+
+---
+
 ## Navigation Fix Applied (Pre-Phase 5)
 
 ### Issue
@@ -132,9 +164,19 @@ export interface Category {
 
 **Seeding Trigger:**
 - Lazy seeding on first category screen load
-- Checks if any categories exist first (via `getCategoryCount`)
-- If count = 0 → runs seeder
+- **Always calls seeder on initialization** (no count === 0 gate)
+- Seeder is idempotent per-category (inserts only missing defaults)
+- Protects against partial-seed failures
 - Non-blocking if seeding fails
+
+**Example Partial-Seed Recovery:**
+1. Initial seeding inserts 3 defaults, then fails
+2. User reopens category screen
+3. Seeder runs again (no count gate)
+4. Seeder checks each default individually
+5. Existing 3 defaults → skipped
+6. Missing 10 defaults → inserted
+7. Sync queue items ONLY for newly inserted 10
 
 ### 4. Category Service (Task 5.4)
 
