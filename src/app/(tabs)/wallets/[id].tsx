@@ -33,8 +33,6 @@ export default function EditWalletScreen() {
   // Form state
   const [name, setName] = useState('');
   const [type, setType] = useState<WalletType>('cash');
-  const [notes, setNotes] = useState('');
-  const [isActive, setIsActive] = useState(true);
 
   /**
    * Load wallet data on mount
@@ -51,8 +49,6 @@ export default function EditWalletScreen() {
           setWallet(w);
           setName(w.name);
           setType(w.type);
-          setNotes(w.notes || '');
-          setIsActive(w.is_active);
         } else {
           Alert.alert('Error', result.error || 'Failed to load wallet', [
             { text: 'OK', onPress: () => router.back() },
@@ -88,8 +84,6 @@ export default function EditWalletScreen() {
       const input: UpdateWalletInput = {
         name: name.trim(),
         type,
-        notes: notes.trim() || null,
-        is_active: isActive,
       };
 
       const result = await updateWallet(user.id, wallet.id, input);
@@ -116,7 +110,6 @@ export default function EditWalletScreen() {
       { value: 'cash', label: 'Cash' },
       { value: 'bank', label: 'Bank' },
       { value: 'ewallet', label: 'E-Wallet' },
-      { value: 'investment', label: 'Investment' },
       { value: 'other', label: 'Other' },
     ];
 
@@ -207,62 +200,6 @@ export default function EditWalletScreen() {
             <Text style={styles.helperText}>
               Opening balance cannot be changed after wallet creation. Future transactions will affect wallet balance.
             </Text>
-          </View>
-
-          {/* Current Balance (READ-ONLY) */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Current Balance</Text>
-            <View style={styles.readOnlyField}>
-              <Text style={styles.readOnlyValue}>
-                {formatRupiah(wallet.balance)}
-              </Text>
-            </View>
-            <Text style={styles.helperText}>
-              Updated by transactions
-            </Text>
-          </View>
-
-          {/* Notes */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Notes (Optional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Additional notes"
-              value={notes}
-              onChangeText={setNotes}
-              maxLength={500}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-              editable={!isSubmitting}
-            />
-          </View>
-
-          {/* Active Status Toggle */}
-          <View style={styles.field}>
-            <View style={styles.toggleRow}>
-              <View style={styles.toggleLabel}>
-                <Text style={styles.label}>Active Wallet</Text>
-                <Text style={styles.helperText}>
-                  Inactive wallets are hidden from main views
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.toggle,
-                  isActive && styles.toggleActive,
-                ]}
-                onPress={() => setIsActive(!isActive)}
-                disabled={isSubmitting}
-              >
-                <View
-                  style={[
-                    styles.toggleThumb,
-                    isActive && styles.toggleThumbActive,
-                  ]}
-                />
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -407,34 +344,6 @@ const styles = StyleSheet.create({
   typeButtonTextActive: {
     color: '#2563EB',
     fontWeight: '600',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  toggleLabel: {
-    flex: 1,
-  },
-  toggle: {
-    width: 52,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#E2E8F0',
-    padding: 2,
-    justifyContent: 'center',
-  },
-  toggleActive: {
-    backgroundColor: '#2563EB',
-  },
-  toggleThumb: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-  },
-  toggleThumbActive: {
-    alignSelf: 'flex-end',
   },
   actions: {
     flexDirection: 'row',

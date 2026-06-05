@@ -254,7 +254,9 @@
   - Soft delete wallet.
   - Queue sync item.
 
-**Phase 4 Status**: Implementation complete. Manual testing checklist available in `PHASE4_SUMMARY.md`.
+**Phase 4 Status**: Implementation complete with schema alignment patch applied. Manual testing checklist available in `PHASE4_SUMMARY.md`.
+
+**Phase 4 Schema Alignment Patch Applied**: Initial Phase 4 implementation added unsupported fields (balance, currency, icon, color, notes, is_active, last_synced_at, investment type) that did not exist in Phase 1 SQLite schema. Patch removed all unsupported fields and aligned wallet implementation with existing schema columns only.
 
 ---
 

@@ -3,6 +3,7 @@
  * 
  * Business logic for wallet management.
  * Orchestrates repository, validation, and sync queue operations.
+ * Aligned with Phase 1 SQLite schema.
  * 
  * IMPORTANT: Service methods receive userId as parameter.
  * Do NOT use useAuth() hook in service layer (React hooks are for components only).
@@ -59,18 +60,11 @@ export async function createWallet(
       user_id: userId,
       name: input.name.trim(),
       type: input.type,
-      balance: input.opening_balance, // Initial balance = opening balance
       opening_balance: input.opening_balance,
-      currency: input.currency || 'IDR',
-      icon: input.icon ?? null,
-      color: input.color ?? null,
-      notes: input.notes ?? null,
-      is_active: input.is_active ?? true,
-      sync_status: 'pending',
-      last_synced_at: null,
-      deleted_at: null,
       created_at: now,
       updated_at: now,
+      deleted_at: null,
+      sync_status: 'pending',
     };
 
     // Get database and repositories
@@ -253,18 +247,16 @@ export async function deleteWallet(
  * Get all wallets for current user
  * 
  * @param userId - Current user ID
- * @param includeInactive - Include inactive wallets (default: false)
  * @returns Result with wallets array or error
  */
 export async function getWallets(
-  userId: string,
-  includeInactive: boolean = false
+  userId: string
 ): Promise<WalletResult<Wallet[]>> {
   try {
     const db = getDatabase();
     const walletRepo = getWalletRepository(db);
 
-    const wallets = await walletRepo.findByUserId(userId, includeInactive);
+    const wallets = await walletRepo.findByUserId(userId);
 
     logger.debug('Wallets retrieved', { userId, count: wallets.length });
 

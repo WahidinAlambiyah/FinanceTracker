@@ -118,7 +118,6 @@ export default function WalletsScreen() {
       cash: 'Cash',
       bank: 'Bank',
       ewallet: 'E-Wallet',
-      investment: 'Investment',
       other: 'Other',
     };
 
@@ -171,14 +170,12 @@ export default function WalletsScreen() {
         {renderSyncStatus(item.sync_status)}
       </View>
 
-      <Text style={styles.walletBalance}>{formatRupiah(item.balance)}</Text>
+      <Text style={styles.walletBalance}>{formatRupiah(item.opening_balance)}</Text>
 
-      {item.notes && <Text style={styles.walletNotes}>{item.notes}</Text>}
-
-      {!item.is_active && (
-        <View style={styles.inactiveBadge}>
-          <Text style={styles.inactiveBadgeText}>Inactive</Text>
-        </View>
+      {!item.sync_status || item.sync_status === 'pending' || item.sync_status === 'failed' ? null : (
+        <Text style={styles.walletHelper}>
+          Current balance calculation will be added after transactions are implemented.
+        </Text>
       )}
     </TouchableOpacity>
   );
@@ -305,23 +302,11 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     marginBottom: 4,
   },
-  walletNotes: {
-    fontSize: 13,
-    color: '#64748B',
-    marginTop: 4,
-  },
-  inactiveBadge: {
-    marginTop: 8,
-    backgroundColor: '#FEF3C7',
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    alignSelf: 'flex-start',
-  },
-  inactiveBadgeText: {
+  walletHelper: {
     fontSize: 12,
-    color: '#D97706',
-    fontWeight: '500',
+    color: '#94A3B8',
+    fontStyle: 'italic',
+    marginTop: 4,
   },
   emptyState: {
     flex: 1,

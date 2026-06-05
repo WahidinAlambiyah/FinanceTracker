@@ -1,14 +1,29 @@
 # Phase 4 Summary — Wallet Management
 
-**Status**: ✅ Complete  
-**Date**: Phase 4 Implementation  
+**Status**: ✅ Complete (Schema Alignment Patch Applied)  
+**Date**: Phase 4 Implementation + Schema Fix  
 **Branch**: (current branch)
+
+---
+
+## Critical Fix Applied
+
+**Schema Mismatch Resolved:**
+
+Initial Phase 4 implementation mistakenly added fields that did not exist in Phase 1 SQLite schema:
+- ❌ Removed: `balance`, `currency`, `icon`, `color`, `notes`, `is_active`, `last_synced_at`
+- ❌ Removed: `investment` wallet type
+
+**Current Implementation Aligned with Phase 1 Schema:**
+- ✅ Only uses existing columns: `id`, `user_id`, `name`, `type`, `opening_balance`, `created_at`, `updated_at`, `deleted_at`, `sync_status`
+- ✅ Wallet types match SQLite CHECK constraint: `cash`, `bank`, `ewallet`, `other`
+- ✅ Sync status match SQLite CHECK constraint: `synced`, `pending`, `failed`, `conflict`
 
 ---
 
 ## Overview
 
-Phase 4 implements complete wallet management with offline-first architecture. Users can create, update, and delete wallets. All wallet operations write to local SQLite first, then queue for background sync to Supabase.
+Phase 4 implements minimal wallet management aligned with Phase 1 SQLite schema. Users can create, update, and delete wallets. All wallet operations write to local SQLite first, then queue for background sync to Supabase.
 
 ---
 
@@ -17,31 +32,45 @@ Phase 4 implements complete wallet management with offline-first architecture. U
 ### 1. Wallet Types and Validation (Task 4.1)
 
 **Files Created:**
-- `src/features/wallets/wallet.types.ts` - TypeScript types for wallets
-- `src/features/wallets/wallet.validation.ts` - Manual validation functions (no Zod dependency)
+- `src/features/wallets/wallet.types.ts` - TypeScript types (schema-aligned)
+- `src/features/wallets/wallet.validation.ts` - Manual validation (no Zod)
 
-**Wallet Types:**
-- `cash` - Cash wallet
-- `bank` - Bank account
-- `ewallet` - E-Wallet (GoPay, OVO, etc.)
-- `investment` - Investment account
-- `other` - Other wallet types
+**Wallet Type Definition (Aligned with SQLite):**
+```typescript
+export interface Wallet {
+  id: string;
+  user_id: string;
+  name: string;
+  type: WalletType;  // 'cash' | 'bank' | 'ewallet' | 'other'
+  opening_balance: number;  // INTEGER Rupiah
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  sync_status: SyncStatus;  // 'synced' | 'pending' | 'failed' | 'conflict'
+}
+```
 
 **Validation Rules:**
 - Name: Required, max 100 characters
-- Type: Must be one of valid wallet types
+- Type: Must be `cash`, `bank`, `ewallet`, or `other`
 - Opening balance: Required integer (Rupiah)
-- Currency: Optional, defaults to 'IDR'
-- Icon: Optional string
-- Color: Optional hex color (#RRGGBB)
-- Notes: Optional, max 500 characters
-- is_active: Optional boolean, defaults to true
 
-**Key Design Decisions:**
-- Used manual validation functions instead of Zod (no new dependencies added)
-- `validateCreateWalletInput()` validates all required fields for creation
-- `validateUpdateWalletInput()` validates optional fields for updates
-- Opening balance is NOT editable after creation (enforced by validation)
+**CreateWalletInput:**
+```typescript
+{
+  name: string;
+  type: WalletType;
+  opening_balance: number;
+}
+```
+
+**UpdateWalletInput:**
+```typescript
+{
+  name?: string;
+  type?: WalletType;
+}
+```
 
 ### 2. Wallet Repository (Task 4.2)
 
@@ -49,46 +78,44 @@ Phase 4 implements complete wallet management with offline-first architecture. U
 - `src/features/wallets/wallet.repository.ts`
 
 **Methods:**
-- `create(wallet)` - Insert wallet into SQLite
-- `update(walletId, updates)` - Update wallet fields
+- `create(wallet)` - Insert wallet (only existing columns)
+- `update(walletId, updates)` - Update name/type only
 - `softDelete(walletId, deletedAt)` - Soft delete via `deleted_at`
 - `findById(walletId)` - Get single wallet
-- `findByUserId(userId, includeInactive)` - Get user's wallets
+- `findByUserId(userId)` - Get user's wallets (no is_active filter)
 - `countByUserId(userId)` - Count user's wallets
 
-**Key Features:**
-- All queries use parameterized statements (`runAsync`, `getFirstAsync`, `getAllAsync`)
-- No SQL injection risk (no string interpolation)
-- Soft delete preserves records for sync reconciliation
-- Boolean fields stored as INTEGER (0/1) and mapped to boolean in TypeScript
-- Singleton pattern with `getWalletRepository(db)` factory
+**Repository INSERT Statement (Aligned with Schema):**
+```sql
+INSERT INTO wallets (
+  id, user_id, name, type, opening_balance,
+  created_at, updated_at, deleted_at, sync_status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+```
+
+**Repository UPDATE Statement (Only Existing Columns):**
+```sql
+UPDATE wallets SET name = ?, type = ?, sync_status = ?, updated_at = ?
+WHERE id = ? AND deleted_at IS NULL
+```
+
+**Repository SELECT Statement:**
+```sql
+SELECT * FROM wallets
+WHERE user_id = ? AND deleted_at IS NULL
+ORDER BY created_at DESC
+```
 
 ### 3. Sync Queue Integration (Task 4.3 - Part 1)
 
 **Files Created:**
-- `src/features/sync/sync-queue.types.ts` - Sync queue type definitions
+- `src/features/sync/sync-queue.types.ts` - Sync queue types
 - `src/features/sync/sync-queue.repository.ts` - Minimal sync queue repository
 - `src/features/sync/index.ts` - Sync feature barrel export
 
 **Sync Queue Scope (Phase 4):**
 - ✅ Add sync queue items (`addSyncQueueItem()`)
 - ❌ Processing/retry/remote sync (deferred to Phase 8/10/11)
-
-**Queue Item Structure:**
-```typescript
-{
-  id: string;                  // UUID
-  entity_name: 'wallets';      // Entity type
-  entity_id: string;           // Wallet UUID
-  operation: 'create' | 'update' | 'delete';
-  payload: string;             // JSON stringified wallet data
-  status: 'pending';           // Always pending in Phase 4
-  retry_count: 0;              // Always 0 in Phase 4
-  last_error: null;            // Always null in Phase 4
-  created_at: string;          // ISO timestamp
-  updated_at: string;          // ISO timestamp
-}
-```
 
 ### 4. Wallet Service (Task 4.3 - Part 2)
 
@@ -100,41 +127,27 @@ Phase 4 implements complete wallet management with offline-first architecture. U
 createWallet(userId: string, input: CreateWalletInput)
 updateWallet(userId: string, walletId: string, input: UpdateWalletInput)
 deleteWallet(userId: string, walletId: string)
-getWallets(userId: string, includeInactive?: boolean)
+getWallets(userId: string)
 getWalletById(userId: string, walletId: string)
 getWalletCount(userId: string)
 ```
 
-**IMPORTANT - Service Design:**
-- ✅ Service methods receive `userId` as parameter (passed from screen/component)
-- ❌ Service does NOT use `useAuth()` hook (React hooks are for components only)
-- Screens call `useAuth()` to get `user.id`, then pass it to service methods
+**Service Design:**
+- ✅ Service methods receive `userId` as parameter
+- ❌ Service does NOT use `useAuth()` hook
+- Screens call `useAuth()` to get user.id, then pass to service
 
 **Wallet Creation Flow:**
-1. Validate input
+1. Validate input (name, type, opening_balance)
 2. Generate UUID and timestamps
-3. Save to local SQLite first
-4. Add sync queue item
-5. Return result to UI
-
-**Wallet Update Flow:**
-1. Validate input
-2. Check wallet exists and belongs to user
-3. Update in local SQLite
-4. Add sync queue item
-5. Return updated wallet
-
-**Wallet Delete Flow:**
-1. Check wallet exists and belongs to user
-2. Soft delete in local SQLite
-3. Add sync queue item
-4. Return success
+3. Save to local SQLite (only existing columns)
+4. Add sync queue item (payload matches schema)
+5. Return wallet to UI
 
 **Opening Balance Rule:**
 - Editable ONLY during wallet creation
 - Read-only on edit screen
-- Initial balance = opening balance
-- Future transactions will update balance
+- Future: Balance will be calculated from transactions (Phase 6)
 
 ### 5. Wallet Screens (Tasks 4.4, 4.5, 4.6)
 
@@ -144,60 +157,40 @@ getWalletCount(userId: string)
 - `src/app/(tabs)/wallets/[id].tsx` - Edit wallet screen
 
 **File Deleted:**
-- `src/app/(tabs)/wallets.tsx` - Old placeholder replaced with nested route structure
-
-**Route Structure:**
-```
-/(tabs)/wallets/          → Wallet list (index.tsx)
-/(tabs)/wallets/new       → Add wallet (new.tsx)
-/(tabs)/wallets/[id]      → Edit wallet ([id].tsx)
-```
+- `src/app/(tabs)/wallets.tsx` - Old placeholder
 
 **Wallet List Screen Features:**
-- Display all active wallets
-- Show wallet name, type badge, balance
+- Display all wallets (no active/inactive filter since `is_active` doesn't exist)
+- Show wallet name, type badge, opening balance
 - Show sync status badge (pending/failed/synced)
-- Show inactive badge if wallet is inactive
+- Helper text: "Current balance calculation will be added after transactions are implemented."
 - Pull-to-refresh support
 - Empty state with "Add Wallet" button
-- FAB (Floating Action Button) for adding wallet
-- Long-press to delete wallet (with confirmation)
-- Tap to edit wallet
+- FAB for adding wallet
+- Long-press to delete (with confirmation)
 
 **Add Wallet Screen Features:**
-- Form fields: name, type selector, opening balance, notes
-- Type selector buttons (Cash, Bank, E-Wallet, Investment, Other)
+- Form fields: name, type selector, opening balance
+- Type selector buttons: Cash, Bank, E-Wallet, Other (NO Investment)
 - Opening balance input supports: `10000`, `10k`, `1.5jt`, `1,5jt`
-- Client-side validation before submission
 - Cancel and Create buttons
-- Loading state during submission
 
 **Edit Wallet Screen Features:**
-- Form fields: name, type selector, notes, active toggle
+- Form fields: name, type selector
 - Opening balance displayed as READ-ONLY with helper text
-- Current balance displayed as READ-ONLY (updated by transactions)
-- Active/inactive toggle switch
+- NO notes field, NO active toggle, NO current balance field
 - Cancel and Save buttons
-- Loading state during submission
 
 **UI/UX Consistency:**
-- Blue theme (`#2563EB` primary, `#F8FAFC` background, `#FFFFFF` cards)
-- Consistent padding (16px)
-- Consistent card design (12px border radius, subtle shadow)
-- Consistent button styles (8px border radius)
-- Sync status badges (pending: amber `#F59E0B`, failed: red `#DC2626`)
-- Type badges (light blue `#EFF6FF` background, blue text)
+- Blue theme (`#2563EB` primary, `#F8FAFC` background)
+- Consistent padding (16px), card radius (12px)
+- Sync status badges (pending: amber, failed: red)
+- Type badges (light blue background)
 
 ### 6. Barrel Export (Task 4.3 - Part 3)
 
 **File Created:**
 - `src/features/wallets/index.ts`
-
-**Exports:**
-- Types: `Wallet`, `WalletType`, `SyncStatus`, `CreateWalletInput`, `UpdateWalletInput`, etc.
-- Validation: `validateCreateWalletInput`, `validateUpdateWalletInput`
-- Repository: `WalletRepository`, `getWalletRepository`
-- Service: `createWallet`, `updateWallet`, `deleteWallet`, `getWallets`, etc.
 
 ---
 
@@ -206,30 +199,20 @@ getWalletCount(userId: string)
 ### Offline-First ✅
 - All wallet writes go to local SQLite first
 - Sync queue items created after each operation
-- No direct Supabase writes (sync happens in Phase 10)
-- Wallets persist across app restarts
-- Offline operations never blocked
+- No direct Supabase writes
 
 ### Data Integrity ✅
-- Client-generated UUIDs (no server dependency)
-- Money stored as INTEGER Rupiah (no floating-point errors)
-- ISO timestamps for all dates
-- Soft delete via `deleted_at` (enables sync reconciliation)
-- Parameterized queries (no SQL injection risk)
+- Client-generated UUIDs
+- Money stored as INTEGER Rupiah
+- ISO timestamps
+- Soft delete via `deleted_at`
+- Parameterized queries (no SQL injection)
 
-### Security ✅
-- User ownership validation (users can only access their own wallets)
-- Generic error messages shown to users
-- Technical errors logged for developers (sanitized by logger)
-- No sensitive data in logs
-
-### UI/UX ✅
-- AGENTS.md blue theme applied consistently
-- Mobile-optimized layouts (consistent padding, clear tap targets)
-- Empty states with helpful messages
-- Loading states for async operations
-- Sync status indicators
-- Pull-to-refresh support
+### Schema Compliance ✅
+- **Repository only inserts/updates/selects existing columns**
+- **Wallet type matches SQLite CHECK constraint** (cash, bank, ewallet, other)
+- **Sync status matches SQLite CHECK constraint** (synced, pending, failed, conflict)
+- **No unsupported fields in types, validation, repository, service, or screens**
 
 ---
 
@@ -240,79 +223,92 @@ getWalletCount(userId: string)
 Phase 4 uses only existing dependencies:
 - `expo-sqlite` (database)
 - `expo-crypto` (UUID generation)
-- `@supabase/supabase-js` (types only, no runtime usage yet)
+- `@supabase/supabase-js` (types only)
 - React Native core components
 
-Manual validation used instead of Zod to avoid adding new dependencies.
+---
+
+## Future Enhancements (NOT in Phase 4)
+
+Advanced wallet fields can be considered in a later phase with proper migration:
+- `balance` (calculated from transactions)
+- `currency` (multi-currency support)
+- `icon` and `color` (UI customization)
+- `notes` (additional wallet description)
+- `is_active` (active/inactive toggle)
+- `last_synced_at` (explicit sync timestamp)
+- `investment` wallet type
+
+These would require:
+1. New SQLite migration to add columns
+2. Update CHECK constraints for wallet type
+3. Update repository queries
+4. Update service logic
+5. Update UI screens
 
 ---
 
 ## Testing
 
-**Automated Tests:** Deferred to Phase 13 (as approved)
+**Automated Tests:** Deferred to Phase 13
 
 **Manual Testing Checklist:**
 
 ### Database and Repository
-- [ ] Verify `sync_queue` table exists
-- [ ] Create wallet and check SQLite record exists
+- [ ] Create wallet and check SQLite record exists with correct columns only
 - [ ] Verify sync queue item created after wallet creation
-- [ ] Update wallet and check SQLite record updated
+- [ ] Update wallet and check SQLite record updated (name/type only)
 - [ ] Verify sync queue item created after wallet update
 - [ ] Delete wallet and check `deleted_at` is set (soft delete)
 - [ ] Verify sync queue item created after wallet delete
-- [ ] Verify wallet `findById()` returns null after soft delete
 
 ### Wallet List Screen
 - [ ] Empty state displays when no wallets
-- [ ] "Add Wallet" button works from empty state
-- [ ] Wallet cards display correctly (name, type, balance)
+- [ ] Wallet cards display correctly (name, type, opening balance)
 - [ ] Sync status badge shows "Sync Pending" for new wallets
+- [ ] Helper text displays: "Current balance calculation will be added after transactions are implemented."
 - [ ] Pull-to-refresh reloads wallet list
 - [ ] Tap wallet card navigates to edit screen
 - [ ] Long-press wallet shows delete confirmation
-- [ ] FAB (+) button navigates to add wallet screen
+- [ ] FAB (+) navigates to add wallet screen
 
 ### Add Wallet Screen
-- [ ] All form fields render correctly
-- [ ] Type selector toggles active state
+- [ ] Form fields render: name, type (4 options), opening balance
+- [ ] Type selector shows: Cash, Bank, E-Wallet, Other (NO Investment)
 - [ ] Opening balance accepts: `10000`, `10k`, `1.5jt`, `1,5jt`
-- [ ] Validation error shows if name is empty
-- [ ] Validation error shows if opening balance is empty
+- [ ] Validation error if name empty
+- [ ] Validation error if opening balance empty
 - [ ] Cancel button returns to wallet list
 - [ ] Create button shows loading spinner
-- [ ] Success alert displays and returns to wallet list
-- [ ] New wallet appears in wallet list
+- [ ] Success alert and returns to wallet list
+- [ ] New wallet appears in list
 
 ### Edit Wallet Screen
 - [ ] Screen loads existing wallet data
 - [ ] Opening balance is READ-ONLY with helper text
-- [ ] Current balance is READ-ONLY
 - [ ] Name can be edited
-- [ ] Type can be changed
-- [ ] Notes can be edited
-- [ ] Active toggle works
+- [ ] Type can be changed (Cash, Bank, E-Wallet, Other only)
+- [ ] NO notes field visible
+- [ ] NO active toggle visible
 - [ ] Cancel button returns to wallet list
 - [ ] Save button updates wallet
-- [ ] Success alert displays and returns to wallet list
-- [ ] Updated wallet reflects changes in wallet list
+- [ ] Updated wallet reflects changes in list
+
+### Schema Compliance
+- [ ] No SQLite column error on create
+- [ ] No SQLite column error on update
+- [ ] No SQLite column error on list display
+- [ ] Wallet type constraint works (rejects invalid types)
+- [ ] Sync status constraint works
 
 ### Offline Behavior
 - [ ] Turn off internet
 - [ ] Create new wallet
 - [ ] Wallet appears in list with "Sync Pending" badge
 - [ ] Update wallet
-- [ ] Wallet updates locally
 - [ ] Delete wallet
-- [ ] Wallet removed from list
 - [ ] Close and reopen app
 - [ ] All offline changes persisted
-
-### User Isolation
-- [ ] Create wallet as User A
-- [ ] Login as User B (different account)
-- [ ] Verify User B cannot see User A's wallets
-- [ ] Verify User B cannot edit User A's wallet by ID
 
 ---
 
@@ -325,17 +321,17 @@ npx tsc --noEmit
 **Expected Result:** No TypeScript errors
 
 **Key Type Safety:**
-- Wallet types properly defined
+- Wallet types match Phase 1 schema exactly
 - Service methods properly typed with userId parameter
-- Repository methods use parameterized query types
+- Repository uses parameterized query types
 - Validation functions return strongly typed results
-- No implicit `any` types
+- No unsupported fields in any type definitions
 
 ---
 
 ## File Summary
 
-### Files Created (15)
+### Files Created (12)
 ```
 src/features/wallets/wallet.types.ts
 src/features/wallets/wallet.validation.ts
@@ -353,55 +349,13 @@ PHASE4_SUMMARY.md
 
 ### Files Modified (1)
 ```
-tasks.md (marked tasks 4.1-4.6 complete, 4.7 deferred to Phase 13)
+tasks.md (marked tasks 4.1-4.6 complete, 4.7 deferred, schema patch documented)
 ```
 
 ### Files Deleted (1)
 ```
 src/app/(tabs)/wallets.tsx (replaced with nested route structure)
 ```
-
----
-
-## Known Limitations (By Design)
-
-1. **No Remote Sync Yet**
-   - Sync queue items created but not processed
-   - Remote sync implementation in Phase 10
-   - All data remains local until sync implemented
-
-2. **No Conflict Resolution**
-   - Last-write-wins conflict resolution in Phase 11
-   - No multi-device sync yet
-
-3. **No Automated Tests**
-   - Deferred to Phase 13 as approved
-   - Manual testing checklist provided instead
-
-4. **No Balance Recalculation from Transactions**
-   - Balance currently set to opening balance on creation
-   - Transaction-based balance calculation in Phase 6
-
-5. **No Wallet Icons**
-   - Icon field exists but not displayed
-   - Can be implemented in future UI polish phase
-
----
-
-## Next Steps
-
-**Phase 5 - Category Management:**
-- Create category types and validation
-- Create category repository
-- Seed default income/expense categories
-- Create category management screens
-- Follow same offline-first pattern as wallet management
-
-**Before Phase 5:**
-- User must approve Phase 4 completion
-- User must review manual testing checklist
-- User must verify TypeScript compilation passes
-- User must verify Expo dev server starts successfully
 
 ---
 
@@ -421,7 +375,7 @@ git status
 git diff
 ```
 
-**Do NOT run these automatically** - user will run them manually and provide feedback.
+**Do NOT run these automatically** - user will run them manually.
 
 ---
 
@@ -431,15 +385,19 @@ git diff
 - [ ] Expo dev server starts successfully
 - [ ] No new dependencies added (confirmed)
 - [ ] Wallet service does NOT use `useAuth()` hook (confirmed)
+- [ ] Wallet types match Phase 1 SQLite schema exactly (confirmed)
+- [ ] Repository only uses existing columns (confirmed)
+- [ ] Wallet type constraint matches schema: cash, bank, ewallet, other (confirmed)
+- [ ] No unsupported fields in types/validation/repository/service/screens (confirmed)
 - [ ] Nested route structure created correctly
 - [ ] Opening balance READ-ONLY on edit screen (confirmed)
-- [ ] Sync queue infrastructure created (minimal scope confirmed)
+- [ ] Sync queue payload matches supported schema
 - [ ] Manual testing checklist reviewed
-- [ ] tasks.md updated honestly
+- [ ] tasks.md updated honestly with schema patch note
 - [ ] Phase 5 has NOT started
 
 ---
 
-**Phase 4 Complete** ✅
+**Phase 4 Complete with Schema Alignment Patch** ✅
 
-All wallet management features implemented following offline-first architecture, AGENTS.md UI guidelines, and approved design corrections.
+Wallet management features implemented and aligned with Phase 1 SQLite schema. All unsupported fields removed. Repository queries only use existing columns.

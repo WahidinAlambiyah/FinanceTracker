@@ -3,6 +3,7 @@
  * 
  * Data access layer for wallet operations.
  * All methods use parameterized queries for SQL injection safety.
+ * Aligned with Phase 1 SQLite schema.
  */
 
 import type { SQLiteDatabase } from 'expo-sqlite';
@@ -13,6 +14,7 @@ import type { Wallet } from './wallet.types';
  * Wallet Repository
  * 
  * Handles all SQLite operations for wallets.
+ * Only uses columns that exist in Phase 1 schema.
  */
 export class WalletRepository {
   constructor(private db: SQLiteDatabase) {}
@@ -26,28 +28,19 @@ export class WalletRepository {
     try {
       await this.db.runAsync(
         `INSERT INTO wallets (
-          id, user_id, name, type, balance, opening_balance,
-          currency, icon, color, notes, is_active,
-          sync_status, last_synced_at, deleted_at,
-          created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          id, user_id, name, type, opening_balance,
+          created_at, updated_at, deleted_at, sync_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           wallet.id,
           wallet.user_id,
           wallet.name,
           wallet.type,
-          wallet.balance,
           wallet.opening_balance,
-          wallet.currency,
-          wallet.icon,
-          wallet.color,
-          wallet.notes,
-          wallet.is_active ? 1 : 0,
-          wallet.sync_status,
-          wallet.last_synced_at,
-          wallet.deleted_at,
           wallet.created_at,
           wallet.updated_at,
+          wallet.deleted_at,
+          wallet.sync_status,
         ]
       );
 
@@ -69,13 +62,7 @@ export class WalletRepository {
     updates: {
       name?: string;
       type?: string;
-      currency?: string;
-      icon?: string | null;
-      color?: string | null;
-      notes?: string | null;
-      is_active?: boolean;
       sync_status?: string;
-      last_synced_at?: string | null;
       updated_at: string;
     }
   ): Promise<void> {
@@ -90,33 +77,9 @@ export class WalletRepository {
       fields.push('type = ?');
       values.push(updates.type);
     }
-    if (updates.currency !== undefined) {
-      fields.push('currency = ?');
-      values.push(updates.currency);
-    }
-    if (updates.icon !== undefined) {
-      fields.push('icon = ?');
-      values.push(updates.icon);
-    }
-    if (updates.color !== undefined) {
-      fields.push('color = ?');
-      values.push(updates.color);
-    }
-    if (updates.notes !== undefined) {
-      fields.push('notes = ?');
-      values.push(updates.notes);
-    }
-    if (updates.is_active !== undefined) {
-      fields.push('is_active = ?');
-      values.push(updates.is_active ? 1 : 0);
-    }
     if (updates.sync_status !== undefined) {
       fields.push('sync_status = ?');
       values.push(updates.sync_status);
-    }
-    if (updates.last_synced_at !== undefined) {
-      fields.push('last_synced_at = ?');
-      values.push(updates.last_synced_at);
     }
 
     // Always update updated_at
@@ -189,16 +152,14 @@ export class WalletRepository {
    * Find all wallets for a user
    * 
    * @param userId - User UUID
-   * @param includeInactive - Include inactive wallets (default: false)
    * @returns Array of wallets
    */
-  async findByUserId(userId: string, includeInactive: boolean = false): Promise<Wallet[]> {
+  async findByUserId(userId: string): Promise<Wallet[]> {
     try {
-      const query = includeInactive
-        ? `SELECT * FROM wallets WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC`
-        : `SELECT * FROM wallets WHERE user_id = ? AND is_active = 1 AND deleted_at IS NULL ORDER BY created_at DESC`;
-
-      const rows = await this.db.getAllAsync<any>(query, [userId]);
+      const rows = await this.db.getAllAsync<any>(
+        `SELECT * FROM wallets WHERE user_id = ? AND deleted_at IS NULL ORDER BY created_at DESC`,
+        [userId]
+      );
 
       return rows.map((row) => this.mapRowToWallet(row));
     } catch (error) {
@@ -239,18 +200,11 @@ export class WalletRepository {
       user_id: row.user_id,
       name: row.name,
       type: row.type,
-      balance: row.balance,
       opening_balance: row.opening_balance,
-      currency: row.currency,
-      icon: row.icon,
-      color: row.color,
-      notes: row.notes,
-      is_active: row.is_active === 1,
-      sync_status: row.sync_status,
-      last_synced_at: row.last_synced_at,
-      deleted_at: row.deleted_at,
       created_at: row.created_at,
       updated_at: row.updated_at,
+      deleted_at: row.deleted_at,
+      sync_status: row.sync_status,
     };
   }
 }

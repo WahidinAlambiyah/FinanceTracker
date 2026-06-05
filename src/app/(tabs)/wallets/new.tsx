@@ -30,7 +30,6 @@ export default function AddWalletScreen() {
   const [name, setName] = useState('');
   const [type, setType] = useState<WalletType>('cash');
   const [openingBalance, setOpeningBalance] = useState('');
-  const [notes, setNotes] = useState('');
 
   /**
    * Handle form submission
@@ -63,8 +62,6 @@ export default function AddWalletScreen() {
         name: name.trim(),
         type,
         opening_balance: parsedBalance,
-        notes: notes.trim() || null,
-        is_active: true,
       };
 
       const result = await createWallet(user.id, input);
@@ -91,7 +88,6 @@ export default function AddWalletScreen() {
       { value: 'cash', label: 'Cash' },
       { value: 'bank', label: 'Bank' },
       { value: 'ewallet', label: 'E-Wallet' },
-      { value: 'investment', label: 'Investment' },
       { value: 'other', label: 'Other' },
     ];
 
@@ -161,22 +157,6 @@ export default function AddWalletScreen() {
             <Text style={styles.helperText}>
               Supports: 10000, 10k, 1.5jt, 1,5jt
             </Text>
-          </View>
-
-          {/* Notes */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Notes (Optional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Additional notes"
-              value={notes}
-              onChangeText={setNotes}
-              maxLength={500}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-              editable={!isSubmitting}
-            />
           </View>
         </View>
       </ScrollView>
