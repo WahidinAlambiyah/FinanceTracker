@@ -88,6 +88,20 @@ export default function TabsLayout() {
 
       {/* Hide nested routes from bottom tab bar */}
       <Tabs.Screen
+        name="transactions/new"
+        options={{
+          href: null,
+          title: 'Add Transaction',
+        }}
+      />
+      <Tabs.Screen
+        name="transactions/[id]"
+        options={{
+          href: null,
+          title: 'Edit Transaction',
+        }}
+      />
+      <Tabs.Screen
         name="wallets/new"
         options={{
           href: null,

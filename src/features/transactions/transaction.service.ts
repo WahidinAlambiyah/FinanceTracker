@@ -203,41 +203,82 @@ export async function updateTransaction(
       return { success: false, error: 'Transaction not found' };
     }
 
-    // 4. If wallet_id changes: verify new wallet
+    // 4. Compute final state after update
+    const finalWalletId = input.wallet_id ?? existingTransaction.wallet_id;
+    const finalDestinationWalletId = input.destination_wallet_id !== undefined 
+      ? input.destination_wallet_id 
+      : existingTransaction.destination_wallet_id;
+    const finalCategoryId = input.category_id !== undefined 
+      ? input.category_id 
+      : existingTransaction.category_id;
+
+    // 5. Validate final state based on existing transaction type
+    if (existingTransaction.type === 'income' || existingTransaction.type === 'expense') {
+      // Income/Expense: category_id must not be null
+      if (!finalCategoryId) {
+        return { 
+          success: false, 
+          error: `${existingTransaction.type.charAt(0).toUpperCase() + existingTransaction.type.slice(1)} transaction requires a category` 
+        };
+      }
+
+      // Income/Expense: destination_wallet_id must be null
+      if (finalDestinationWalletId) {
+        return { 
+          success: false, 
+          error: `${existingTransaction.type.charAt(0).toUpperCase() + existingTransaction.type.slice(1)} transaction cannot have a destination wallet` 
+        };
+      }
+
+      // Verify category exists, belongs to user, and matches transaction type
+      const category = await categoryRepo.findById(finalCategoryId);
+      if (!category || category.user_id !== userId) {
+        return { success: false, error: 'Category not found' };
+      }
+      
+      if (category.type !== existingTransaction.type) {
+        return { 
+          success: false, 
+          error: `Cannot use ${category.type} category for ${existingTransaction.type} transaction` 
+        };
+      }
+    } else if (existingTransaction.type === 'transfer') {
+      // Transfer: destination_wallet_id must not be null
+      if (!finalDestinationWalletId) {
+        return { 
+          success: false, 
+          error: 'Transfer transaction requires a destination wallet' 
+        };
+      }
+
+      // Transfer: category_id must be null
+      if (finalCategoryId) {
+        return { 
+          success: false, 
+          error: 'Transfer transaction cannot have a category' 
+        };
+      }
+
+      // Transfer: source and destination must be different
+      if (finalWalletId === finalDestinationWalletId) {
+        return { 
+          success: false, 
+          error: 'Source and destination wallets must be different' 
+        };
+      }
+
+      // Verify destination wallet exists and belongs to user
+      const destWallet = await walletRepo.findById(finalDestinationWalletId);
+      if (!destWallet || destWallet.user_id !== userId) {
+        return { success: false, error: 'Destination wallet not found' };
+      }
+    }
+
+    // 6. If wallet_id changes: verify new wallet exists and belongs to user
     if (input.wallet_id && input.wallet_id !== existingTransaction.wallet_id) {
       const wallet = await walletRepo.findById(input.wallet_id);
       if (!wallet || wallet.user_id !== userId) {
         return { success: false, error: 'Wallet not found' };
-      }
-    }
-
-    // 5. If destination_wallet_id changes: verify wallet
-    if (input.destination_wallet_id !== undefined && 
-        input.destination_wallet_id !== existingTransaction.destination_wallet_id) {
-      if (input.destination_wallet_id) {
-        const destWallet = await walletRepo.findById(input.destination_wallet_id);
-        if (!destWallet || destWallet.user_id !== userId) {
-          return { success: false, error: 'Destination wallet not found' };
-        }
-      }
-    }
-
-    // 6. If category_id changes: verify category
-    if (input.category_id !== undefined && 
-        input.category_id !== existingTransaction.category_id) {
-      if (input.category_id) {
-        const category = await categoryRepo.findById(input.category_id);
-        if (!category || category.user_id !== userId) {
-          return { success: false, error: 'Category not found' };
-        }
-        
-        // Verify category type matches transaction type
-        if (category.type !== existingTransaction.type) {
-          return { 
-            success: false, 
-            error: `Cannot use ${category.type} category for ${existingTransaction.type} transaction` 
-          };
-        }
       }
     }
 

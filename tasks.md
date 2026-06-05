@@ -306,7 +306,7 @@
 
 ## Phase 6 — Transaction Management
 
-- [ ] 6.1 Create transaction model and validation schema
+- [x] 6.1 Create transaction model and validation schema
   - Type: income, expense, transfer.
   - Amount.
   - Wallet ID.
@@ -316,7 +316,7 @@
   - Transaction date.
   - Requirements: REQ-TRX-001, REQ-TRX-002, REQ-TRX-003, REQ-TRX-004
 
-- [ ] 6.2 Create transaction repository
+- [x] 6.2 Create transaction repository
   - Create transaction.
   - Update transaction.
   - Soft delete transaction.
@@ -324,13 +324,13 @@
   - List transactions by month.
   - Requirements: REQ-TRX-005, REQ-TRX-006, REQ-TRX-007
 
-- [ ] 6.3 Create transaction service
+- [x] 6.3 Create transaction service
   - Validate transaction.
   - Save locally.
   - Add sync queue item.
   - Requirements: REQ-SYNC-001
 
-- [ ] 6.4 Create add transaction screen
+- [x] 6.4 Create add transaction screen
   - Type selector.
   - Amount input.
   - Wallet selector.
@@ -341,24 +341,34 @@
   - Save button.
   - Requirements: REQ-UX-001, REQ-UX-005
 
-- [ ] 6.5 Create edit transaction screen
+- [x] 6.5 Create edit transaction screen
   - Load transaction.
   - Update transaction.
   - Soft delete transaction.
 
-- [ ] 6.6 Create transactions list screen
+- [x] 6.6 Create transactions list screen
   - Show recent transactions.
   - Filter by month.
   - Filter by type.
   - Show pending sync state.
 
-- [ ] 6.7 Add transaction tests
+- [ ] 6.7 Add transaction tests (Deferred to Phase 13)
   - Add income.
   - Add expense.
   - Add transfer.
   - Reject amount <= 0.
   - Reject transfer to same wallet.
   - Queue sync item.
+
+**Phase 6 Status**: Implementation complete with update-flow validation patch applied. Manual testing checklist available in `PHASE6_SUMMARY.md`.
+
+**Phase 6 Update-Flow Validation Patch Applied**: Initial implementation validated inputs separately but didn't validate the final state after merging updates with existing transaction data. Patch computes final state (finalWalletId, finalDestinationWalletId, finalCategoryId) before validation, enforces type-specific rules based on existing transaction type (read-only), and prevents invalid field combinations.
+
+**Phase 6 Route Structure**: Migrated from flat `transactions.tsx` to nested folder structure `transactions/index.tsx`, `transactions/new.tsx`, `transactions/[id].tsx`. Hidden nested routes from tab bar using `href: null`. Bottom tab bar shows only 5 main tabs.
+
+**Phase 6 Date Input Approach**: Default to current timestamp with read-only display on create/edit. No date picker dependency added in Phase 6 (deferred to future phase if requested).
+
+**Phase 6 Transaction Type Constraint**: Type is READ-ONLY on edit. Users must delete and recreate if type change is needed (prevents complex validation state issues).
 
 ---
 
