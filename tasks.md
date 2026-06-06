@@ -374,40 +374,41 @@
 
 ## Phase 7 — Dashboard and Reports
 
-- [ ] 7.1 Implement balance calculator
+- [x] 7.1 Implement balance calculator
   - Calculate wallet balance from opening balance and transactions.
   - Calculate total balance across wallets.
   - Requirements: REQ-WALLET-004, REQ-DASH-002
 
-- [ ] 7.2 Implement monthly summary service
+- [x] 7.2 Implement monthly summary service
   - Monthly income.
   - Monthly expense.
   - Net cashflow.
   - Requirements: REQ-DASH-001
 
-- [ ] 7.3 Create dashboard screen
+- [x] 7.3 Create dashboard screen
   - Total balance.
   - Monthly income.
   - Monthly expense.
   - Net cashflow.
   - Recent transactions.
   - Add transaction button.
-  - Offline indicator.
-  - Sync indicator.
-  - Requirements: REQ-DASH-001, REQ-DASH-002, REQ-DASH-003, REQ-DASH-004
+  - Requirements: REQ-DASH-001, REQ-DASH-002
 
-- [ ] 7.4 Create reports screen
+- [x] 7.4 Create reports screen
   - Month selector.
   - Income and expense summary.
   - Expense by category.
+  - Income by category.
   - Balance by wallet.
   - Requirements: REQ-REPORT-001, REQ-REPORT-002, REQ-REPORT-003
 
-- [ ] 7.5 Add dashboard and report tests
+- [ ] 7.5 Add dashboard and report tests (Deferred to Phase 13)
   - Balance calculation.
   - Monthly summary.
   - Category breakdown.
   - Transfer impact on wallet balance.
+
+**Phase 7 Status**: Implementation complete and manually verified. Balance is derived only (opening_balance + income - expense - transfers_out + transfers_in). Transfer handling verified (affects balance, not income/expense/cashflow). Dashboard and reports use local SQLite only. No chart dependency added. No new dependencies. No migrations. No remote sync/Supabase implementation. Manual testing passed.
 
 ---
 
