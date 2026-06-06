@@ -1,8 +1,11 @@
 /**
- * Sync Feature Module
+ * Sync Feature Barrel Export
  * 
- * Barrel export for sync-related exports.
+ * Phase 4: Sync queue repository (add only)
+ * Phase 8: Sync queue expanded, sync metadata repository
  */
 
+export * from './sync-queue.repository';
 export * from './sync-queue.types';
-export { SyncQueueRepository, getSyncQueueRepository } from './sync-queue.repository';
+export * from './sync-metadata.repository';
+export * from './sync-metadata.types';

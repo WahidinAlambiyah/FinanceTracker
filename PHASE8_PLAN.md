@@ -1214,7 +1214,6 @@ git diff
 
 **Package**: `@react-native-community/netinfo`  
 **Version**: Latest (compatible with Expo SDK 56)  
-**Size**: ~10KB  
 **License**: MIT  
 **Maintainer**: React Native Community  
 **GitHub**: https://github.com/react-native-netinfo/react-native-netinfo
@@ -1227,19 +1226,17 @@ git diff
 - Accurate network detection is essential for sync foundation
 
 **Why This Package**:
-- Official React Native community package
-- Well-maintained (active development, frequent updates)
-- Widely used (10M+ downloads/week on npm)
-- Works on Android, iOS, Web, Windows, macOS
-- Small bundle size (~10KB)
+- Expo-compatible package
+- Cross-platform support (Android, iOS, Web)
+- Supports network state fetch and subscription
 - Event-based (no polling, efficient)
-- Detects network type (wifi, cellular, ethernet, none)
+- Required for accurate online/offline status display
 
 **Alternative Considered**:
 - Always assume offline → Poor UX, not realistic
 - Build custom network detector → Reinventing the wheel, high risk
 
-**Recommendation**: Approve `@react-native-community/netinfo` for Phase 8.
+**Recommendation**: Approved by user for Phase 8.
 
 ### Installation Command
 

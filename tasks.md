@@ -414,12 +414,12 @@
 
 ## Phase 8 — Network and Sync Foundation
 
-- [ ] 8.1 Implement network status service
+- [x] 8.1 Implement network status service
   - Detect online/offline state.
   - Expose current connectivity state.
   - Requirements: REQ-DASH-003
 
-- [ ] 8.2 Create sync queue repository
+- [x] 8.2 Create sync queue repository
   - Add queue item.
   - Find pending items.
   - Mark processing.
@@ -428,17 +428,25 @@
   - Increment retry count.
   - Requirements: REQ-SYNC-001, REQ-SYNC-003
 
-- [ ] 8.3 Implement sync metadata repository
+- [x] 8.3 Implement sync metadata repository
   - Get last_sync_at.
   - Set last_sync_at.
   - Requirements: REQ-SYNC-004
 
-- [ ] 8.4 Create sync status badge component
+- [x] 8.4 Create sync status badge component
   - Show synced.
   - Show pending.
   - Show failed.
   - Show offline.
   - Requirements: REQ-DASH-004
+
+- [ ] 8.5 Add sync tests (Deferred to Phase 13)
+  - Unit tests for network service
+  - Unit tests for sync queue repository
+  - Unit tests for sync metadata repository
+  - UI tests for sync status badge
+
+**Phase 8 Status**: Implementation complete. Network detection using @react-native-community/netinfo. Sync queue repository expanded with query/update methods. Sync metadata repository implemented. Sync status badge component created. Dashboard shows network status. Settings displays sync status (network state, pending/failed counts, last sync placeholder). All sync data remains local SQLite only. No remote sync processing implemented. No Supabase schema/RLS/write/read implemented. Phase 9 and Phase 10 have not started.
 
 ---
 

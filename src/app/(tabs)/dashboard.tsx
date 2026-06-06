@@ -5,6 +5,7 @@
  * - Total balance across all wallets (derived)
  * - Monthly income, expense, and net cashflow
  * - Recent transactions
+ * - Network status badge (Phase 8)
  * 
  * Balance is DERIVED ONLY (never stored, never mutated).
  * All data from local SQLite only.
@@ -26,6 +27,8 @@ import { useAuth } from '@/features/auth';
 import { getDashboardSummary } from '@/features/dashboard';
 import { formatRupiah } from '@/lib/utils/money';
 import { formatIndonesianDate } from '@/lib/utils/date';
+import { getNetworkService } from '@/lib/network/network.service';
+import { SyncStatusBadge } from '@/components/finance/SyncStatusBadge';
 import type { DashboardSummary } from '@/features/dashboard';
 
 export default function DashboardScreen() {
@@ -35,6 +38,22 @@ export default function DashboardScreen() {
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+
+  /**
+   * Subscribe to network state (Phase 8)
+   */
+  useEffect(() => {
+    const networkService = getNetworkService();
+
+    // Get initial state
+    networkService.isOnline().then(setIsOnline);
+
+    // Subscribe to changes
+    const unsubscribe = networkService.subscribeToNetworkState(setIsOnline);
+
+    return unsubscribe;
+  }, []);
 
   /**
    * Load dashboard data
@@ -268,6 +287,16 @@ export default function DashboardScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Header with network status badge */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Dashboard</Text>
+        <SyncStatusBadge
+          status={isOnline ? 'synced' : 'offline'}
+          size="small"
+          showLabel={true}
+        />
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -292,6 +321,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0F172A',
   },
   centered: {
     flex: 1,
