@@ -526,6 +526,228 @@ For now, this single `AGENTS.md` file is the authoritative guide.
 
 ---
 
+## AI Collaboration and Credit Efficiency Rules
+
+This section defines the role split between **User**, **ChatGPT**, and **Kiro** to optimize collaboration and minimize unnecessary AI credit usage.
+
+### User Responsibilities
+
+The **User** should handle:
+
+1. **Terminal Commands**: Running all terminal commands manually (`npx`, `npm`, `git`, etc.)
+2. **Manual Testing**: Testing app on device/emulator, checking functionality
+3. **Small Markdown Edits**: Minor documentation updates (typo fixes, formatting)
+4. **Typo Fixes**: Correcting spelling and grammar errors
+5. **Duplicate Line Removal**: Cleaning up duplicate documentation lines
+6. **Git Operations**: Commit, push, and branch management
+7. **Commit Review**: Sending commit hash for review after implementation
+8. **Decision Making**: Final approval for phases, features, and architectural changes
+
+**Why**: These tasks are quick for humans but consume AI credits unnecessarily.
+
+---
+
+### ChatGPT Responsibilities
+
+**ChatGPT** (non-coding AI assistant) should handle:
+
+1. **GitHub Commit Review**: Reviewing commits from GitHub UI, checking file changes
+2. **Phase Boundary Checking**: Ensuring phase scope is respected (no Phase 9 work in Phase 8)
+3. **Strict Prompt Preparation**: Creating detailed, scoped prompts for Kiro
+4. **Kiro Output Review**: Analyzing Kiro's code output for correctness and scope compliance
+5. **Log and Error Analysis**: Reviewing error logs, suggesting root cause
+6. **Manual Test Checklists**: Creating step-by-step manual testing procedures
+7. **Credit Efficiency Decisions**: Deciding whether Kiro is needed or user can handle task
+8. **Documentation Review**: Checking documentation for completeness and accuracy
+
+**Why**: ChatGPT can analyze, plan, and review without consuming expensive coding credits.
+
+---
+
+### Kiro Responsibilities
+
+**Kiro** (AI coding agent) should be used **ONLY** for:
+
+1. **Multi-File Coding Implementation**: Complex features spanning multiple files
+2. **Complex Debugging**: Issues requiring code analysis across repositories/services
+3. **Repository/Service/Screen Implementation**: Creating new feature modules
+4. **Test Automation**: Writing tests **when explicitly requested by user**
+5. **Refactoring**: Code improvements **only when explicitly requested**
+6. **Documentation Updates**: Large documentation tasks **only when explicitly requested and worth the credit**
+
+**Why**: Kiro consumes significant credits. Reserve for tasks requiring code generation and complex analysis.
+
+---
+
+### Kiro Credit-Efficiency Rules
+
+**Do NOT use Kiro for:**
+
+1. **Tiny Documentation Cleanup**:
+   - Typo fixes (User handles)
+   - Duplicate line removal (User handles)
+   - Checklist text changes (User handles)
+   - Markdown formatting (User handles)
+
+2. **Unnecessary File Inspection**:
+   - Do not read unrelated files unless needed for the task
+   - Do not inspect entire repository for small changes
+   - Keep file reads focused and minimal
+
+3. **Unsolicited Improvements**:
+   - Do not refactor unless explicitly requested
+   - Do not improve unrelated code
+   - Do not add features beyond the approved scope
+   - Do not optimize prematurely
+
+4. **Automatic Operations**:
+   - Do not run terminal commands automatically (User runs manually)
+   - Do not add dependencies without explicit approval
+   - Do not add migrations without explicit approval
+   - Do not implement next phase without explicit approval
+
+5. **Verbose Reporting**:
+   - Report only relevant changed files
+   - Keep verification notes concise
+   - Do not repeat entire file contents in summaries
+   - Provide manual commands for user to run
+
+**Golden Rule**: If a task takes **User 30 seconds**, do not use Kiro (credits are expensive).
+
+---
+
+### Phase Boundary Rules
+
+These rules ensure incremental, reviewable progress:
+
+1. **Each Phase Must Be Completed Before Moving Forward**:
+   - Implementation → Review → Manual Testing → Documentation → Approval
+   - User must explicitly approve before proceeding to next phase
+
+2. **Planning the Next Phase**:
+   - **Allowed**: Create implementation plan for next phase after current phase completes
+   - **NOT Allowed**: Implement next phase without explicit approval
+
+3. **Implementation Restrictions**:
+   - Do not implement Phase 9 until Phase 8 is approved
+   - Do not implement Phase 10 until Phase 9 is approved
+   - Do not skip phases (e.g., jump from Phase 7 to Phase 9)
+
+4. **Offline-First Principle** (Foundational):
+   - Runtime data **must** come from local SQLite first
+   - Supabase sync/schema/RLS **only** in approved phase
+   - Do not bypass SQLite for financial data
+
+5. **Scope Discipline**:
+   - Keep changes minimal and scoped to current phase
+   - Do not add "nice-to-have" features beyond phase scope
+   - Do not refactor unrelated code during phase implementation
+
+6. **Review and Approval Gate**:
+   - After phase completion, user reviews commit in GitHub
+   - User manually tests on device/emulator
+   - User sends commit hash for final review
+   - User provides explicit approval before next phase
+
+**Example Phase Flow**:
+```
+Phase 7 Complete → User Approves
+  ↓
+Phase 8 Planning → User Reviews Plan → User Approves Plan
+  ↓
+Phase 8 Implementation → Kiro Implements
+  ↓
+Phase 8 Testing → User Tests Manually → Reports Results
+  ↓
+Phase 8 Documentation → Kiro Updates Docs
+  ↓
+Phase 8 Review → User Reviews Commit → Sends Hash
+  ↓
+Phase 8 Approval → User Approves → Phase 8 Closed
+  ↓
+Phase 9 Planning (repeat cycle)
+```
+
+---
+
+### Important Restrictions (Always Enforced)
+
+**Documentation Only vs. Code Changes**:
+- When user says "documentation only", do NOT change:
+  - Application code (`src/app`, `src/features`, `src/components`, `src/lib`)
+  - `package.json` or `package-lock.json`
+  - Database migrations
+  - Dependencies
+
+**Dependency Management**:
+- Do NOT add dependencies without explicit user approval
+- Always ask before installing packages
+- Document dependency justification in implementation plan
+
+**Migration Management**:
+- Do NOT add database migrations without explicit user approval
+- Migrations must be reviewed before execution
+- Document migration necessity and impact
+
+**Formula and Behavior Preservation**:
+- Do NOT change wallet/category/transaction behavior unless explicitly requested
+- Do NOT change dashboard/report formulas unless explicitly requested
+- Do NOT change sync behavior unless explicitly requested
+- Balance calculation must remain derived (never stored, never mutated)
+
+---
+
+### Credit Efficiency Examples
+
+**❌ BAD - Wastes Kiro Credits**:
+- User: "Fix typo in AGENTS.md line 42"
+- Kiro: Reads entire AGENTS.md, fixes typo, regenerates file
+- **Cost**: Expensive (Kiro credits for simple task)
+- **Better**: User fixes typo manually in 10 seconds
+
+**✅ GOOD - Efficient**:
+- User: "Implement Phase 8 network detection with NetInfo"
+- Kiro: Implements network service, expands repositories, creates components
+- **Cost**: Justified (complex multi-file implementation)
+
+**❌ BAD - Unnecessary Inspection**:
+- User: "Add comment to network.service.ts"
+- Kiro: Reads dashboard.tsx, settings.tsx, all repos, all components
+- **Cost**: Wasted reads on unrelated files
+
+**✅ GOOD - Focused**:
+- User: "Add comment to network.service.ts"
+- Kiro: Reads only network.service.ts, adds comment
+- **Cost**: Minimal and focused
+
+---
+
+### Collaboration Decision Tree
+
+**Is the task simple?** (Typo fix, small doc edit, markdown formatting)
+- → **User handles** (30 seconds for human)
+
+**Is the task analytical?** (Review commit, check phase scope, analyze error log)
+- → **ChatGPT handles** (no coding credits needed)
+
+**Is the task complex?** (Multi-file implementation, complex debugging, new feature)
+- → **Kiro handles** (coding credits justified)
+
+**Is the task manual?** (Run commands, test on device, commit/push)
+- → **User handles** (AI cannot access device/terminal)
+
+---
+
+### Summary
+
+**User**: Manual operations, testing, git, small edits  
+**ChatGPT**: Analysis, planning, review, decision support  
+**Kiro**: Complex coding, multi-file implementation, debugging  
+
+**Goal**: Minimize AI credit usage while maintaining high code quality and productivity.
+
+---
+
 ## How to Use This Guide
 
 ### For Kiro AI Agent:
@@ -549,5 +771,5 @@ For now, this single `AGENTS.md` file is the authoritative guide.
 
 ---
 
-**Last Updated**: Phase 2 Completion (Pre-Phase 3 Checkpoint)  
+**Last Updated**: Phase 8 Completion (Post-Phase 8 Verification)  
 **Status**: Authoritative guide for all contributors (AI and human)
