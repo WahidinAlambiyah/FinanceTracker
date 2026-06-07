@@ -466,21 +466,33 @@ unsubscribe();
 
 ## Manual Testing Checklist and Results
 
+### Important Note: Native Rebuild Required
+
+**Post-Implementation Discovery**:
+- After initial commit `dba0b78b3f3d91968cf15b892e453ac46105c160`, the app crashed with error: `@react-native-community/netinfo: NativeModule.RNCNetInfo is null`
+- **Root Cause**: `@react-native-community/netinfo` is a native module that requires Expo development build to be rebuilt after installation
+- **Solution**: Rebuilt Expo development build using `eas build --profile development --platform android`
+- **Result**: Error resolved after reinstalling rebuilt app
+
+**Key Lesson**: Adding native modules to Expo development builds requires:
+1. ✅ JavaScript package installation (`npx expo install`)
+2. ✅ **Native rebuild and reinstall** (required for native modules)
+
 ### Test 1: App Starts Normally ✅
 
 **Steps**:
-1. Kill app process
-2. Start app with `npx expo start --dev-client`
-3. Open app on device/emulator
+1. Rebuild Expo development build with `eas build --profile development --platform android`
+2. Install rebuilt APK on device
+3. Launch app
 
 **Expected**:
 - ✅ App starts without errors
 - ✅ Login screen appears (if logged out)
 - ✅ Dashboard appears (if logged in)
 - ✅ No SQLite errors
-- ✅ No NetInfo errors
+- ✅ No NetInfo errors (NativeModule.RNCNetInfo is null)
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
 
 ### Test 2: Dashboard Still Loads ✅
 
@@ -540,7 +552,13 @@ unsubscribe();
 - ✅ Badge shows "Online" with green dot
 - ✅ Badge text displays
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
+
+**Important Clarification**: 
+- Badge shows "Online" based on network connectivity only
+- Does NOT mean Supabase sync has occurred (Phase 10)
+- "Online" = device has internet connection
+- Phase 8 does not implement remote sync
 
 ### Test 6: Network Badge Shows Offline When Disconnected ✅
 
@@ -553,7 +571,7 @@ unsubscribe();
 - ✅ Badge changes to "Offline" with gray dot
 - ✅ Badge updates automatically (no manual refresh)
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
 
 ### Test 7: Settings Displays Last Sync Placeholder ✅
 
@@ -565,7 +583,12 @@ unsubscribe();
 - ✅ "Last Sync: Never synced" displays
 - ✅ This is correct (no sync processing yet)
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
+
+**Clarification**: 
+- "Never synced" is accurate for Phase 8
+- Phase 8 does not implement remote sync
+- Sync processing will be available in Phase 10
 
 ### Test 8: Pending Sync Count Displays ✅
 
@@ -581,7 +604,9 @@ unsubscribe();
 - ✅ Count increases after creating records
 - ✅ Count matches number of pending items
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
+
+**Result**: PASS (after rebuild)
 
 ### Test 9: Failed Sync Count Displays ✅
 
@@ -593,7 +618,7 @@ unsubscribe();
 - ✅ "Failed: 0 items" displays
 - ✅ This is correct (no sync processing yet, no failures)
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
 
 ### Test 10: No Automatic Sync Triggered ✅
 
@@ -609,7 +634,7 @@ unsubscribe();
 - ✅ Items remain in pending state
 - ✅ This is correct (sync processing is Phase 10)
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
 
 ### Test 11: No SQLite Errors Appear ✅
 
@@ -621,11 +646,11 @@ unsubscribe();
 
 **Expected**:
 - ✅ No SQLite errors
-- ✅ No NetInfo errors
+- ✅ No NetInfo errors (NativeModule.RNCNetInfo is null resolved after rebuild)
 - ✅ No TypeScript errors
 - ✅ No runtime errors
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
 
 ### Test 12: Bottom Tab Remains Stable ✅
 
@@ -639,7 +664,53 @@ unsubscribe();
 - ✅ No extra tabs added
 - ✅ No tabs removed
 
-**Result**: PASS
+**Result**: PASS (after rebuild)
+
+---
+
+## Sync Status Badge Clarification
+
+**Important**: The sync status badge in Phase 8 reflects **network connectivity only**, NOT remote Supabase sync status.
+
+**Badge Status Meanings**:
+
+1. **"Online" (Green Dot)**:
+   - Device has internet connection (wifi or cellular)
+   - Does NOT mean Supabase sync has occurred
+   - Phase 8 does not implement remote sync
+   - Badge shows network state only
+
+2. **"Offline" (Gray Dot)**:
+   - Device has no internet connection (airplane mode or no network)
+   - Does NOT mean sync failed
+   - Badge shows network state only
+
+3. **"Synced" Status** (Future - Phase 10+):
+   - If badge ever shows "Synced" in future phases:
+     - Must only mean local queue/status is clear
+     - Does NOT imply remote Supabase sync completed (until Phase 10)
+   - Phase 8 does not use "Synced" status
+
+4. **"Pending" Status**:
+   - Items exist in local sync_queue with status = 'pending'
+   - Does NOT mean sync is in progress
+   - Items remain pending until Phase 10 implements sync processing
+
+5. **"Failed" Status**:
+   - Items exist in local sync_queue with status = 'failed'
+   - Only possible after Phase 10 implements sync processing
+   - Phase 8 should show 0 failed items
+
+**Phase 8 Dashboard Badge Behavior**:
+- Shows "Online" when device has internet → Green dot
+- Shows "Offline" when device has no internet → Gray dot
+- Does NOT show "Synced" or "Pending" status (network state only)
+
+**Phase 8 Settings Display**:
+- Network: "Online" or "Offline" (based on network detection)
+- Last Sync: "Never synced" (accurate - no sync processing yet)
+- Pending: Count from local queue (items waiting for Phase 10)
+- Failed: 0 items (no sync processing yet)
 
 ---
 
@@ -780,7 +851,11 @@ git commit -m "Phase 8: Network and Sync Foundation - Complete
 
 **Phase 8 Complete ✅**
 
-**Status**: Implementation complete and manually tested  
+**Status**: Implementation complete, manually tested, and verified after native rebuild  
 **Date**: Phase 8 Completion  
 
-Network detection and sync foundation implemented. All sync data remains local SQLite only. No remote sync processing. No Supabase schema/RLS/write/read. App remains fully offline-first. Ready for user review and approval.
+Network detection and sync foundation implemented. All sync data remains local SQLite only. No remote sync processing. No Supabase schema/RLS/write/read. App remains fully offline-first.
+
+**Native Rebuild Note**: After adding `@react-native-community/netinfo`, Expo development build was rebuilt using `eas build --profile development --platform android`. The rebuilt app was installed and tested successfully. Network detection works correctly. No NetInfo native module errors.
+
+Ready for user review and approval.
