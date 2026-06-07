@@ -606,8 +606,6 @@ unsubscribe();
 
 **Result**: PASS (after rebuild)
 
-**Result**: PASS (after rebuild)
-
 ### Test 9: Failed Sync Count Displays ✅
 
 **Steps**:
