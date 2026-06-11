@@ -441,7 +441,13 @@ CREATE TABLE IF NOT EXISTS sync_metadata (
 
 **Implementation Phase:** Phase 9 (Supabase Remote Schema and RLS)
 
-**Note:** The following schema definitions are for Phase 9+ implementation. Phase 3 (current) implements authentication only, using Supabase Auth (`auth.users`) without custom application tables.
+**Note:** The following schema definitions are for Phase 9+ implementation. Current runtime financial data remains SQLite-first. Phase 9 prepares remote tables and RLS only; it must not add remote push/pull sync, remote repositories, sync queue processing, or Supabase financial reads/writes in the app.
+
+**Phase 9 boundaries:**
+- Do not create a remote `sync_queue` table for MVP unless separately approved.
+- Do not store wallet balances remotely; balances remain derived from opening balance and transactions.
+- Do not include remote `sync_status` by default; local sync status is app-local state unless Phase 10 proves a remote field is needed.
+- Keep all application tables in the `financetracker` schema, not `public`.
 
 ## 9.1 profiles
 

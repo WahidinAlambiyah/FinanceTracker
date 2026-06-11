@@ -452,6 +452,8 @@
 
 ## Phase 9 — Supabase Remote Schema and RLS
 
+**Phase 9A Planning Status**: Documentation-only plan created in `PHASE9_PLAN.md`. No Supabase schema, RLS policies, SQL migrations, remote repositories, sync queue processing, or runtime app behavior changes have been implemented yet.
+
 - [ ] 9.1 Create Supabase SQL migration
   - profiles table.
   - wallets table.

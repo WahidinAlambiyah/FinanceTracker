@@ -35,17 +35,34 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 2. Copy your project URL and anon key from Settings → API
 3. Add them to your `.env` file
 
-### 3. Row Level Security (Future)
+### 3. Row Level Security (Phase 9+)
 
-When implementing remote sync (Phase 9+), enable RLS on all user tables:
+Remote financial tables must use the custom `financetracker` schema, not `public`.
+Supabase Auth remains managed in the default `auth` schema.
+
+Planned application tables:
+
+- `financetracker.profiles`
+- `financetracker.wallets`
+- `financetracker.categories`
+- `financetracker.transactions`
+
+When implementing remote schema/RLS, enable RLS on all user-owned application tables:
 
 ```sql
-ALTER TABLE public.wallets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financetracker.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financetracker.wallets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financetracker.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financetracker.transactions ENABLE ROW LEVEL SECURITY;
 ```
 
-And add policies to ensure users can only access their own data.
+Policies must ensure users can only select, insert, update, or delete their own rows. For inserts and updates, use `WITH CHECK (auth.uid() = user_id)` on user-owned tables.
+
+Important Phase 9 boundary:
+
+- Do not push or pull financial data during schema/RLS setup.
+- Do not process `sync_queue` until Phase 10.
+- Keep runtime reads and writes SQLite-first.
 
 ## Security
 
