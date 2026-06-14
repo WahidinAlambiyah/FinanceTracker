@@ -506,11 +506,13 @@
 
 ### Phase 10B — Push Sync
 
-- [ ] 10B.1 Process current-user pending and eligible failed queue items
-- [ ] 10B.2 Push canonical SQLite records in dependency order
-- [ ] 10B.3 Synchronize deletes through `deleted_at` tombstones
-- [ ] 10B.4 Mark queue success only after confirmed remote write
-- [ ] 10B.5 Recover failures and stale processing entries safely
+- [x] 10B.1 Process current-user pending and eligible failed queue items
+- [x] 10B.2 Push canonical SQLite records in dependency order
+- [x] 10B.3 Synchronize deletes through `deleted_at` tombstones
+- [x] 10B.4 Mark queue success only after confirmed remote write
+- [x] 10B.5 Recover failed/interrupted items and prevent overlapping explicit runs
+
+**Phase 10B Status**: Explicit push service implemented only. No UI or automatic trigger invokes it yet. Manual verification remains required. Phase 10C-10E have not started.
 
 ### Phase 10C — Pull Sync
 

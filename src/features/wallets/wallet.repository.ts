@@ -148,6 +148,21 @@ export class WalletRepository {
     }
   }
 
+  /** Load the canonical wallet for sync, including soft-deleted rows. */
+  async findByIdForSync(userId: string, walletId: string): Promise<Wallet | null> {
+    try {
+      const row = await this.db.getFirstAsync<any>(
+        `SELECT * FROM wallets WHERE id = ? AND user_id = ?`,
+        [walletId, userId]
+      );
+
+      return row ? this.mapRowToWallet(row) : null;
+    } catch (error) {
+      logger.error('Failed to find wallet for sync', error);
+      throw new Error('Failed to retrieve wallet for sync');
+    }
+  }
+
   /**
    * Find all wallets for a user
    * 

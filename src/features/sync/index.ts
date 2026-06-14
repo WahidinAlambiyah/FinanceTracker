@@ -14,3 +14,5 @@ export * from './remote-profile.repository';
 export * from './remote-wallet.repository';
 export * from './remote-category.repository';
 export * from './remote-transaction.repository';
+export * from './push-sync.types';
+export * from './push-sync.service';

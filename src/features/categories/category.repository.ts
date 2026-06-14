@@ -155,6 +155,21 @@ export class CategoryRepository {
     }
   }
 
+  /** Load the canonical category for sync, including soft-deleted rows. */
+  async findByIdForSync(userId: string, categoryId: string): Promise<Category | null> {
+    try {
+      const row = await this.db.getFirstAsync<any>(
+        `SELECT * FROM categories WHERE id = ? AND user_id = ?`,
+        [categoryId, userId]
+      );
+
+      return row ? this.mapRowToCategory(row) : null;
+    } catch (error) {
+      logger.error('Failed to find category for sync', error);
+      throw new Error('Failed to retrieve category for sync');
+    }
+  }
+
   /**
    * Find categories for a user (optionally filtered by type)
    * 

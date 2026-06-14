@@ -114,6 +114,15 @@ export class TransactionRepository {
     return result || null;
   }
 
+  /** Load the canonical transaction for sync, including soft-deleted rows. */
+  async findByIdForSync(userId: string, transactionId: string): Promise<Transaction | null> {
+    const result = await this.db.getFirstAsync<Transaction>(
+      `SELECT * FROM transactions WHERE id = ? AND user_id = ?`,
+      [transactionId, userId]
+    );
+    return result || null;
+  }
+
   /**
    * Find transactions by user ID
    */

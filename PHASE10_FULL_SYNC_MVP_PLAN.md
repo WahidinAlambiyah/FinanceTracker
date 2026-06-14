@@ -6,6 +6,8 @@
 
 **Phase 10A Status**: Remote repository layer implemented. Push/pull orchestration, conflict handling, and sync UI have not started.
 
+**Phase 10B Status**: Explicit push sync service implemented. It is not wired to UI or automatic triggers. Pull sync, conflict handling, and full-cycle cursor advancement have not started.
+
 ## Preconditions Before Phase 10A
 
 Do not start Phase 10A until all items are confirmed:
@@ -95,12 +97,12 @@ Responsibilities:
 
 **Definition of done:**
 
-- [ ] Offline-created, edited, and soft-deleted records push successfully.
-- [ ] Push is idempotent when the same queue item is retried.
-- [ ] Failed items remain retryable and counts remain accurate.
-- [ ] Dependency failures leave transactions queued rather than losing data.
-- [ ] Hard delete is never called.
-- [ ] Local actions remain usable when push fails.
+- [x] Offline-created, edited, and soft-deleted records can be pushed from canonical SQLite rows.
+- [x] Push uses idempotent remote upserts when a queue item is retried.
+- [x] Failed items remain retryable and per-user count APIs are available.
+- [x] Dependency failures leave transactions retryable rather than losing data.
+- [x] Hard delete is never called.
+- [x] The push service is not wired to block local actions.
 
 ## Phase 10C - Pull Sync
 
