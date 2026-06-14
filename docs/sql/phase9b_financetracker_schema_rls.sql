@@ -27,8 +27,13 @@ create schema if not exists financetracker;
 comment on schema financetracker is
   'FinanceTracker application data schema. Auth remains managed by Supabase in auth schema.';
 
--- Allow authenticated users to access objects in the custom schema.
--- RLS policies below still enforce row-level ownership.
+-- Grant strategy:
+-- - Financial data is available to authenticated users only.
+-- - Anonymous access is intentionally not granted unless separately approved.
+-- - The custom "financetracker" schema must be exposed manually in Supabase
+--   API settings before Phase 10 remote repositories can access it.
+-- - RLS policies below still enforce row-level ownership after schema/table
+--   privileges are granted.
 grant usage on schema financetracker to authenticated;
 
 -- 2. Profiles
@@ -185,12 +190,22 @@ comment on table financetracker.transactions is
 --
 -- The authenticated role needs table privileges before RLS policies can allow
 -- access. RLS still restricts rows per policy.
-grant select, insert, update, delete
+grant select, insert, update
   on financetracker.profiles,
      financetracker.wallets,
      financetracker.categories,
      financetracker.transactions
   to authenticated;
+
+-- Hard DELETE is intentionally unavailable to authenticated clients for MVP.
+-- Local and future remote sync must represent deletion by updating deleted_at.
+-- Revoke DELETE explicitly in case privileges were granted by an earlier draft.
+revoke delete
+  on financetracker.profiles,
+     financetracker.wallets,
+     financetracker.categories,
+     financetracker.transactions
+  from authenticated;
 
 -- 7. Enable Row Level Security
 alter table financetracker.profiles enable row level security;
@@ -205,7 +220,7 @@ create policy "Users can select own profile"
   on financetracker.profiles
   for select
   to authenticated
-  using (auth.uid() = id);
+  using (auth.uid() is not null and auth.uid() = id);
 
 drop policy if exists "Users can insert own profile"
   on financetracker.profiles;
@@ -213,7 +228,7 @@ create policy "Users can insert own profile"
   on financetracker.profiles
   for insert
   to authenticated
-  with check (auth.uid() = id);
+  with check (auth.uid() is not null and auth.uid() = id);
 
 drop policy if exists "Users can update own profile"
   on financetracker.profiles;
@@ -221,8 +236,8 @@ create policy "Users can update own profile"
   on financetracker.profiles
   for update
   to authenticated
-  using (auth.uid() = id)
-  with check (auth.uid() = id);
+  using (auth.uid() is not null and auth.uid() = id)
+  with check (auth.uid() is not null and auth.uid() = id);
 
 -- No profile DELETE policy is included in this draft. Profile removal should be
 -- handled through auth account lifecycle or soft delete unless separately approved.
@@ -234,7 +249,7 @@ create policy "Users can select own wallets"
   on financetracker.wallets
   for select
   to authenticated
-  using (auth.uid() = user_id);
+  using (auth.uid() is not null and auth.uid() = user_id);
 
 drop policy if exists "Users can insert own wallets"
   on financetracker.wallets;
@@ -242,7 +257,7 @@ create policy "Users can insert own wallets"
   on financetracker.wallets
   for insert
   to authenticated
-  with check (auth.uid() = user_id);
+  with check (auth.uid() is not null and auth.uid() = user_id);
 
 drop policy if exists "Users can update own wallets"
   on financetracker.wallets;
@@ -250,16 +265,12 @@ create policy "Users can update own wallets"
   on financetracker.wallets
   for update
   to authenticated
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  using (auth.uid() is not null and auth.uid() = user_id)
+  with check (auth.uid() is not null and auth.uid() = user_id);
 
+-- Remove any hard-delete policy that may exist from an earlier draft.
 drop policy if exists "Users can delete own wallets"
   on financetracker.wallets;
-create policy "Users can delete own wallets"
-  on financetracker.wallets
-  for delete
-  to authenticated
-  using (auth.uid() = user_id);
 
 -- Normal app delete should remain a soft delete:
 -- update financetracker.wallets set deleted_at = now(), updated_at = now() where ...
@@ -271,7 +282,7 @@ create policy "Users can select own categories"
   on financetracker.categories
   for select
   to authenticated
-  using (auth.uid() = user_id);
+  using (auth.uid() is not null and auth.uid() = user_id);
 
 drop policy if exists "Users can insert own categories"
   on financetracker.categories;
@@ -279,7 +290,7 @@ create policy "Users can insert own categories"
   on financetracker.categories
   for insert
   to authenticated
-  with check (auth.uid() = user_id);
+  with check (auth.uid() is not null and auth.uid() = user_id);
 
 drop policy if exists "Users can update own categories"
   on financetracker.categories;
@@ -287,16 +298,12 @@ create policy "Users can update own categories"
   on financetracker.categories
   for update
   to authenticated
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  using (auth.uid() is not null and auth.uid() = user_id)
+  with check (auth.uid() is not null and auth.uid() = user_id);
 
+-- Remove any hard-delete policy that may exist from an earlier draft.
 drop policy if exists "Users can delete own categories"
   on financetracker.categories;
-create policy "Users can delete own categories"
-  on financetracker.categories
-  for delete
-  to authenticated
-  using (auth.uid() = user_id);
 
 -- Normal app delete should remain a soft delete:
 -- update financetracker.categories set deleted_at = now(), updated_at = now() where ...
@@ -308,7 +315,7 @@ create policy "Users can select own transactions"
   on financetracker.transactions
   for select
   to authenticated
-  using (auth.uid() = user_id);
+  using (auth.uid() is not null and auth.uid() = user_id);
 
 drop policy if exists "Users can insert own transactions"
   on financetracker.transactions;
@@ -316,7 +323,7 @@ create policy "Users can insert own transactions"
   on financetracker.transactions
   for insert
   to authenticated
-  with check (auth.uid() = user_id);
+  with check (auth.uid() is not null and auth.uid() = user_id);
 
 drop policy if exists "Users can update own transactions"
   on financetracker.transactions;
@@ -324,16 +331,12 @@ create policy "Users can update own transactions"
   on financetracker.transactions
   for update
   to authenticated
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  using (auth.uid() is not null and auth.uid() = user_id)
+  with check (auth.uid() is not null and auth.uid() = user_id);
 
+-- Remove any hard-delete policy that may exist from an earlier draft.
 drop policy if exists "Users can delete own transactions"
   on financetracker.transactions;
-create policy "Users can delete own transactions"
-  on financetracker.transactions
-  for delete
-  to authenticated
-  using (auth.uid() = user_id);
 
 -- Normal app delete should remain a soft delete:
 -- update financetracker.transactions set deleted_at = now(), updated_at = now() where ...
