@@ -40,6 +40,12 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 Remote financial tables must use the custom `financetracker` schema, not `public`.
 Supabase Auth remains managed in the default `auth` schema.
 
+Phase 9B SQL draft:
+
+- `docs/sql/phase9b_financetracker_schema_rls.sql`
+- Draft only; it has not been executed in Supabase.
+- Review manually before applying.
+
 Planned application tables:
 
 - `financetracker.profiles`

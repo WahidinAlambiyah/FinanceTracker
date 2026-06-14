@@ -454,6 +454,11 @@
 
 **Phase 9A Planning Status**: Documentation-only plan created in `PHASE9_PLAN.md`. No Supabase schema, RLS policies, SQL migrations, remote repositories, sync queue processing, or runtime app behavior changes have been implemented yet.
 
+- [x] 9.0 Prepare Phase 9B SQL draft only
+  - Draft file: `docs/sql/phase9b_financetracker_schema_rls.sql`.
+  - SQL has not been executed in Supabase.
+  - Schema/RLS implementation remains awaiting review and manual execution approval.
+
 - [ ] 9.1 Create Supabase SQL migration
   - profiles table.
   - wallets table.

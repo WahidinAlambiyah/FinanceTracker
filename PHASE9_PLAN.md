@@ -4,6 +4,8 @@
 **Recommended first step**: Documentation-only Phase 9A  
 **Dependencies**: Phase 8 approved and closed
 
+**Phase 9B Status**: SQL draft prepared at `docs/sql/phase9b_financetracker_schema_rls.sql`. It has not been executed in Supabase and remains awaiting manual review and application approval.
+
 ---
 
 ## 1. Current Architecture Summary
@@ -140,6 +142,7 @@ Decisions needed:
 2. Phase 9B: Schema SQL draft
    - Add reviewed SQL for `financetracker` schema, tables, indexes, and RLS.
    - Do not execute automatically.
+   - Draft file: `docs/sql/phase9b_financetracker_schema_rls.sql`.
 
 3. Phase 9C: Manual Supabase application
    - User applies SQL manually in Supabase after review.
