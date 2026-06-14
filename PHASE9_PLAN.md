@@ -6,6 +6,8 @@
 
 **Phase 9B Status**: SQL draft prepared at `docs/sql/phase9b_financetracker_schema_rls.sql`. It has not been executed in Supabase and remains awaiting manual review and application approval.
 
+**Phase 9C Status**: Manual apply and RLS test guide prepared at `docs/sql/PHASE9C_MANUAL_APPLY_AND_RLS_TEST.md`. Phase 9C has not been executed or completed.
+
 ---
 
 ## 1. Current Architecture Summary
@@ -147,6 +149,7 @@ Decisions needed:
 3. Phase 9C: Manual Supabase application
    - User applies SQL manually in Supabase after review.
    - User manually tests RLS with two users.
+   - Follow `docs/sql/PHASE9C_MANUAL_APPLY_AND_RLS_TEST.md`.
 
 4. Phase 10: Push sync
    - Add remote repositories and sync queue processor.

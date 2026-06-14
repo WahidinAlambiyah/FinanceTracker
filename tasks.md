@@ -459,6 +459,11 @@
   - SQL has not been executed in Supabase.
   - Schema/RLS implementation remains awaiting review and manual execution approval.
 
+- [x] 9.0.1 Prepare Phase 9C manual apply and RLS test guide
+  - Guide file: `docs/sql/PHASE9C_MANUAL_APPLY_AND_RLS_TEST.md`.
+  - Documentation only; no SQL was executed.
+  - Phase 9C manual application and testing remain pending.
+
 - [ ] 9.1 Create Supabase SQL migration
   - profiles table.
   - wallets table.
