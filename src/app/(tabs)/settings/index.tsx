@@ -22,7 +22,7 @@ import {
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { getDatabase } from '@/lib/db';
-import { getSyncQueueRepository, pushSyncService } from '@/features/sync';
+import { getSyncQueueRepository } from '@/features/sync';
 import { getNetworkService } from '@/lib/network/network.service';
 import { SyncStatusBadge } from '@/components/finance/SyncStatusBadge';
 
@@ -33,7 +33,6 @@ export default function SettingsScreen() {
   const [pendingCount, setPendingCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
   const [isLoadingSyncStatus, setIsLoadingSyncStatus] = useState(true);
-  const [isDevPushRunning, setIsDevPushRunning] = useState(false);
 
   /**
    * Load sync status from local SQLite (Phase 8)
@@ -121,27 +120,6 @@ export default function SettingsScreen() {
     );
   }
 
-  /** Temporary local-only Phase 10B manual verification trigger. */
-  async function handleDevPushPendingChanges() {
-    if (isDevPushRunning) return;
-
-    setIsDevPushRunning(true);
-    try {
-      const result = await pushSyncService.pushPendingChanges();
-      console.log('DEV push pending changes result', result);
-      Alert.alert(
-        'DEV Push Result',
-        `Pushed: ${result.pushedCount}\nSkipped: ${result.skippedCount}\nFailed: ${result.failedCount}`
-      );
-      await loadSyncStatus();
-    } catch (error) {
-      console.error('DEV push pending changes failed', error);
-      Alert.alert('DEV Push Failed', 'Push verification could not be completed.');
-    } finally {
-      setIsDevPushRunning(false);
-    }
-  }
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -217,20 +195,6 @@ export default function SettingsScreen() {
                   Queue counts are device-local and not user-filtered yet.
                 </Text>
 
-                <TouchableOpacity
-                  style={[
-                    styles.devPushButton,
-                    isDevPushRunning && styles.devPushButtonDisabled,
-                  ]}
-                  onPress={handleDevPushPendingChanges}
-                  disabled={isDevPushRunning}
-                >
-                  {isDevPushRunning ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <Text style={styles.devPushButtonText}>DEV: Push pending changes</Text>
-                  )}
-                </TouchableOpacity>
               </>
             )}
           </View>
@@ -357,22 +321,6 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontStyle: 'italic',
     marginTop: 12,
-  },
-  devPushButton: {
-    marginTop: 16,
-    borderRadius: 8,
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  devPushButtonDisabled: {
-    backgroundColor: '#94A3B8',
-  },
-  devPushButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
   },
   settingRow: {
     flexDirection: 'row',
