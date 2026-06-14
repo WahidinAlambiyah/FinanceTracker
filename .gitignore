@@ -40,3 +40,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+tmp-*.mjs
+# Temporary local verification scripts
+tmp-*.mjs
