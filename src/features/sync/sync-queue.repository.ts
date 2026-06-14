@@ -359,7 +359,7 @@ export class SyncQueueRepository {
     try {
       await this.db.runAsync(
         `UPDATE sync_queue
-         SET status = 'success', updated_at = ?
+         SET status = 'success', last_error = NULL, updated_at = ?
          WHERE id = ?`,
         [now, id]
       );
