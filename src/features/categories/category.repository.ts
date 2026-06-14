@@ -170,6 +170,44 @@ export class CategoryRepository {
     }
   }
 
+  /** Apply an RLS-scoped remote category, including soft-delete tombstones. */
+  async applyRemoteCategory(category: Omit<Category, 'sync_status'>): Promise<void> {
+    try {
+      await this.db.runAsync(
+        `INSERT INTO categories (
+          id, user_id, name, type, icon, color, is_default,
+          created_at, updated_at, deleted_at, sync_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'synced')
+        ON CONFLICT(id) DO UPDATE SET
+          user_id = excluded.user_id,
+          name = excluded.name,
+          type = excluded.type,
+          icon = excluded.icon,
+          color = excluded.color,
+          is_default = excluded.is_default,
+          created_at = excluded.created_at,
+          updated_at = excluded.updated_at,
+          deleted_at = excluded.deleted_at,
+          sync_status = 'synced'`,
+        [
+          category.id,
+          category.user_id,
+          category.name,
+          category.type,
+          category.icon,
+          category.color,
+          category.is_default ? 1 : 0,
+          category.created_at,
+          category.updated_at,
+          category.deleted_at,
+        ]
+      );
+    } catch (error) {
+      logger.error('Failed to apply remote category to SQLite', error);
+      throw new Error('Failed to apply remote category locally');
+    }
+  }
+
   /**
    * Find categories for a user (optionally filtered by type)
    * 

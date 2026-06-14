@@ -16,3 +16,5 @@ export * from './remote-category.repository';
 export * from './remote-transaction.repository';
 export * from './push-sync.types';
 export * from './push-sync.service';
+export * from './pull-sync.types';
+export * from './pull-sync.service';

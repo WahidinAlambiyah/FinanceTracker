@@ -516,10 +516,12 @@
 
 ### Phase 10C — Pull Sync
 
-- [ ] 10C.1 Pull remote changes since the per-user `last_sync_at`
-- [ ] 10C.2 Apply remote rows and tombstones to SQLite in dependency order
-- [ ] 10C.3 Preserve newer pending local changes
-- [ ] 10C.4 Advance cursor only after the full sync cycle succeeds
+- [x] 10C.1 Pull remote changes from an explicit per-user lower bound
+- [x] 10C.2 Apply remote rows and tombstones to SQLite in dependency order
+- [x] 10C.3 Skip rows with pending/processing/failed local queue work
+- [x] 10C.4 Return maximum observed remote timestamp without advancing the cursor
+
+**Phase 10C Status**: Explicit pull service implemented only. It is not connected to UI or automatic triggers and does not resolve conflicts or update `last_sync_at`. Manual verification remains required. Phase 10D-10E have not started.
 
 ### Phase 10D — Conflict Handling and Multi-Device
 

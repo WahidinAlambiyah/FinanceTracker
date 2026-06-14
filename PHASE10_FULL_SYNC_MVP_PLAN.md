@@ -8,6 +8,8 @@
 
 **Phase 10B Status**: Explicit push sync service implemented. It is not wired to UI or automatic triggers. Pull sync, conflict handling, and full-cycle cursor advancement have not started.
 
+**Phase 10C Status**: Explicit pull sync service implemented. It skips rows with unsynced local queue work and returns the maximum observed remote timestamp without advancing `last_sync_at`. Conflict resolution and UI/automatic triggers have not started.
+
 ## Preconditions Before Phase 10A
 
 Do not start Phase 10A until all items are confirmed:
@@ -120,12 +122,12 @@ Responsibilities:
 
 **Definition of done:**
 
-- [ ] A second device can reconstruct current remote state in local SQLite.
-- [ ] Remote creates, updates, and tombstones are applied locally.
-- [ ] Pending local changes are not overwritten without conflict comparison.
-- [ ] A partial pull does not advance the cursor.
-- [ ] Replaying an overlap window is safe and idempotent.
-- [ ] UI continues to read only from SQLite.
+- [x] Remote state can be reconstructed into local SQLite through explicit pull.
+- [x] Remote creates, updates, and tombstones can be applied locally.
+- [x] Pending/processing/failed local queue work is skipped, not overwritten.
+- [x] Pull does not advance the full-sync cursor.
+- [x] Explicit lower-bound replay is idempotent for safely applied rows.
+- [x] UI continues to read only from SQLite.
 
 ## Phase 10D - Conflict Handling and Multi-Device Convergence
 

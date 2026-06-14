@@ -163,6 +163,40 @@ export class WalletRepository {
     }
   }
 
+  /** Apply an RLS-scoped remote wallet, including soft-delete tombstones. */
+  async applyRemoteWallet(wallet: Omit<Wallet, 'sync_status'>): Promise<void> {
+    try {
+      await this.db.runAsync(
+        `INSERT INTO wallets (
+          id, user_id, name, type, opening_balance,
+          created_at, updated_at, deleted_at, sync_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'synced')
+        ON CONFLICT(id) DO UPDATE SET
+          user_id = excluded.user_id,
+          name = excluded.name,
+          type = excluded.type,
+          opening_balance = excluded.opening_balance,
+          created_at = excluded.created_at,
+          updated_at = excluded.updated_at,
+          deleted_at = excluded.deleted_at,
+          sync_status = 'synced'`,
+        [
+          wallet.id,
+          wallet.user_id,
+          wallet.name,
+          wallet.type,
+          wallet.opening_balance,
+          wallet.created_at,
+          wallet.updated_at,
+          wallet.deleted_at,
+        ]
+      );
+    } catch (error) {
+      logger.error('Failed to apply remote wallet to SQLite', error);
+      throw new Error('Failed to apply remote wallet locally');
+    }
+  }
+
   /**
    * Find all wallets for a user
    * 

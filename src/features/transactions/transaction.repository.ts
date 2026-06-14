@@ -123,6 +123,45 @@ export class TransactionRepository {
     return result || null;
   }
 
+  /** Apply an RLS-scoped remote transaction, including soft-delete tombstones. */
+  async applyRemoteTransaction(
+    transaction: Omit<Transaction, 'sync_status'>
+  ): Promise<void> {
+    await this.db.runAsync(
+      `INSERT INTO transactions (
+        id, user_id, type, wallet_id, destination_wallet_id, category_id,
+        amount, note, transaction_date, created_at, updated_at, deleted_at, sync_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'synced')
+      ON CONFLICT(id) DO UPDATE SET
+        user_id = excluded.user_id,
+        type = excluded.type,
+        wallet_id = excluded.wallet_id,
+        destination_wallet_id = excluded.destination_wallet_id,
+        category_id = excluded.category_id,
+        amount = excluded.amount,
+        note = excluded.note,
+        transaction_date = excluded.transaction_date,
+        created_at = excluded.created_at,
+        updated_at = excluded.updated_at,
+        deleted_at = excluded.deleted_at,
+        sync_status = 'synced'`,
+      [
+        transaction.id,
+        transaction.user_id,
+        transaction.type,
+        transaction.wallet_id,
+        transaction.destination_wallet_id,
+        transaction.category_id,
+        transaction.amount,
+        transaction.note,
+        transaction.transaction_date,
+        transaction.created_at,
+        transaction.updated_at,
+        transaction.deleted_at,
+      ]
+    );
+  }
+
   /**
    * Find transactions by user ID
    */

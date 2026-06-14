@@ -19,6 +19,7 @@ import type {
   SyncQueueItem,
   AddSyncQueueItemInput,
   QueueStatus,
+  EntityName,
 } from './sync-queue.types';
 
 /**
@@ -216,6 +217,31 @@ export class SyncQueueRepository {
       return result?.count ?? 0;
     } catch (error) {
       logger.error('Failed to count sync items for user', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check whether an entity has local work that has not completed remotely.
+   * Pull sync must not overwrite these rows before Phase 10D resolves them.
+   */
+  async hasUnsyncedItemsForEntity(
+    entityName: EntityName,
+    entityId: string
+  ): Promise<boolean> {
+    try {
+      const result = await this.db.getFirstAsync<{ count: number }>(
+        `SELECT COUNT(*) AS count
+         FROM sync_queue
+         WHERE entity_name = ?
+           AND entity_id = ?
+           AND status IN ('pending', 'processing', 'failed')`,
+        [entityName, entityId]
+      );
+
+      return (result?.count ?? 0) > 0;
+    } catch (error) {
+      logger.error('Failed to check unsynced queue items for entity', error);
       throw error;
     }
   }
