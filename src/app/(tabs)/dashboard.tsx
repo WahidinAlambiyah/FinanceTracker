@@ -291,7 +291,7 @@ export default function DashboardScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Dashboard</Text>
         <SyncStatusBadge
-          status={isOnline ? 'synced' : 'offline'}
+          status={isOnline ? 'online' : 'offline'}
           size="small"
           showLabel={true}
         />

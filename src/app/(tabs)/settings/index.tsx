@@ -157,7 +157,7 @@ export default function SettingsScreen() {
                 <View style={styles.syncRow}>
                   <Text style={styles.syncLabel}>Network</Text>
                   <SyncStatusBadge
-                    status={isOnline ? 'synced' : 'offline'}
+                    status={isOnline ? 'online' : 'offline'}
                     size="small"
                     showLabel={true}
                   />
@@ -175,7 +175,7 @@ export default function SettingsScreen() {
 
                 {/* Pending Items */}
                 <View style={styles.syncRow}>
-                  <Text style={styles.syncLabel}>Pending</Text>
+                  <Text style={styles.syncLabel}>Pending local queue</Text>
                   <Text style={styles.syncValue}>
                     {pendingCount} {pendingCount === 1 ? 'item' : 'items'}
                   </Text>
@@ -192,7 +192,7 @@ export default function SettingsScreen() {
                 </View>
 
                 <Text style={styles.syncHint}>
-                  Sync processing will be available in Phase 10
+                  Queue counts are device-local and not user-filtered yet.
                 </Text>
               </>
             )}

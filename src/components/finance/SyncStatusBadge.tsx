@@ -11,7 +11,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export type SyncStatus = 'synced' | 'pending' | 'failed' | 'offline';
+export type SyncStatus = 'online' | 'synced' | 'pending' | 'failed' | 'offline';
 
 interface SyncStatusBadgeProps {
   status: SyncStatus;
@@ -23,6 +23,7 @@ interface SyncStatusBadgeProps {
  * Sync Status Badge
  * 
  * Color coding:
+ * - online: green (#10B981)
  * - synced: green (#10B981)
  * - pending: amber (#F59E0B)
  * - failed: red (#EF4444)
@@ -35,6 +36,8 @@ export function SyncStatusBadge({
 }: SyncStatusBadgeProps) {
   const getStatusColor = (): string => {
     switch (status) {
+      case 'online':
+        return '#10B981'; // green
       case 'synced':
         return '#10B981'; // green
       case 'pending':
@@ -50,6 +53,8 @@ export function SyncStatusBadge({
 
   const getStatusLabel = (): string => {
     switch (status) {
+      case 'online':
+        return 'Online';
       case 'synced':
         return 'Synced';
       case 'pending':
