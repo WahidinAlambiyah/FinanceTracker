@@ -197,6 +197,19 @@ export class WalletRepository {
     }
   }
 
+  async markSyncedIfUnchanged(
+    userId: string,
+    walletId: string,
+    expectedUpdatedAt: string
+  ): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE wallets
+       SET sync_status = 'synced'
+       WHERE id = ? AND user_id = ? AND updated_at = ?`,
+      [walletId, userId, expectedUpdatedAt]
+    );
+  }
+
   /**
    * Find all wallets for a user
    * 

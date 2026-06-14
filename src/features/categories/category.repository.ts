@@ -208,6 +208,19 @@ export class CategoryRepository {
     }
   }
 
+  async markSyncedIfUnchanged(
+    userId: string,
+    categoryId: string,
+    expectedUpdatedAt: string
+  ): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE categories
+       SET sync_status = 'synced'
+       WHERE id = ? AND user_id = ? AND updated_at = ?`,
+      [categoryId, userId, expectedUpdatedAt]
+    );
+  }
+
   /**
    * Find categories for a user (optionally filtered by type)
    * 

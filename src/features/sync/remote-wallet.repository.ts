@@ -50,6 +50,23 @@ export class RemoteWalletRepository {
     return mapWalletRow(response.data);
   }
 
+  async findWalletById(userId: string, walletId: string): Promise<RemoteWalletRow | null> {
+    await assertAuthenticatedOwner(userId);
+
+    const { data, error } = await remoteDatabase
+      .from('wallets')
+      .select(WALLET_COLUMNS)
+      .eq('user_id', userId)
+      .eq('id', walletId)
+      .maybeSingle();
+
+    if (error) {
+      throwRemoteRepositoryError('findById', 'wallet', walletId, error);
+    }
+
+    return data ? mapWalletRow(data as Record<string, unknown>) : null;
+  }
+
   async findWalletsUpdatedAfter(
     userId: string,
     updatedAfter: string

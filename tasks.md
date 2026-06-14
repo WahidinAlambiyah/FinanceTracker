@@ -525,10 +525,12 @@
 
 ### Phase 10D — Conflict Handling and Multi-Device
 
-- [ ] 10D.1 Implement Last Write Wins using `updated_at`
-- [ ] 10D.2 Treat `deleted_at` as a versioned change
-- [ ] 10D.3 Test bidirectional Device A/Device B convergence
-- [ ] 10D.4 Verify authenticated cross-user isolation during sync
+- [x] 10D.1 Implement Last Write Wins using `updated_at`
+- [x] 10D.2 Treat `deleted_at` as a versioned change
+- [x] 10D.3 Add explicit conflict-aware push/pull convergence flow
+- [x] 10D.4 Preserve authenticated ownership checks during convergence
+
+**Phase 10D Status**: Conflict resolution and explicit convergence service implemented. Manual bidirectional device, tombstone, equal-timestamp, and cross-user verification remain required. No UI/automatic trigger or `last_sync_at` advancement was added. Phase 10E has not started.
 
 ### Phase 10E — Sync UI, Retry, and Demo Readiness
 

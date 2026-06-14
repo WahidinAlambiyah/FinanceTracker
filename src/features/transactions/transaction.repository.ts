@@ -162,6 +162,19 @@ export class TransactionRepository {
     );
   }
 
+  async markSyncedIfUnchanged(
+    userId: string,
+    transactionId: string,
+    expectedUpdatedAt: string
+  ): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE transactions
+       SET sync_status = 'synced'
+       WHERE id = ? AND user_id = ? AND updated_at = ?`,
+      [transactionId, userId, expectedUpdatedAt]
+    );
+  }
+
   /**
    * Find transactions by user ID
    */

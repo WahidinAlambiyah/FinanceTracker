@@ -63,6 +63,26 @@ export class RemoteTransactionRepository {
     return mapTransactionRow(response.data);
   }
 
+  async findTransactionById(
+    userId: string,
+    transactionId: string
+  ): Promise<RemoteTransactionRow | null> {
+    await assertAuthenticatedOwner(userId);
+
+    const { data, error } = await remoteDatabase
+      .from('transactions')
+      .select(TRANSACTION_COLUMNS)
+      .eq('user_id', userId)
+      .eq('id', transactionId)
+      .maybeSingle();
+
+    if (error) {
+      throwRemoteRepositoryError('findById', 'transaction', transactionId, error);
+    }
+
+    return data ? mapTransactionRow(data as Record<string, unknown>) : null;
+  }
+
   async findTransactionsUpdatedAfter(
     userId: string,
     updatedAfter: string

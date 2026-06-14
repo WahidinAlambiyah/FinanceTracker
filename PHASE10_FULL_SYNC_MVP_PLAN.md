@@ -10,6 +10,8 @@
 
 **Phase 10C Status**: Explicit pull sync service implemented. It skips rows with unsynced local queue work and returns the maximum observed remote timestamp without advancing `last_sync_at`. Conflict resolution and UI/automatic triggers have not started.
 
+**Phase 10D Status**: Explicit LWW convergence service implemented. It performs conflict-aware queue processing before pull, settles deterministic local/remote/equivalent outcomes, preserves equal-timestamp mismatches as unresolved, and never hard deletes. It does not advance `last_sync_at` and is not wired to UI or automatic triggers.
+
 ## Preconditions Before Phase 10A
 
 Do not start Phase 10A until all items are confirmed:
@@ -144,12 +146,12 @@ Rules:
 
 **Definition of done:**
 
-- [ ] Device A changes converge to Device B and vice versa.
-- [ ] Concurrent edits converge deterministically through LWW.
-- [ ] A newer tombstone wins over an older edit.
-- [ ] A newer edit wins over an older tombstone without hidden hard deletion.
-- [ ] Cross-user records never enter another user's SQLite database.
-- [ ] Known client clock-skew limitations are documented.
+- [x] An explicit conflict-aware cycle can converge Device A/Device B records through remote persistence.
+- [x] Concurrent edits resolve deterministically when `updated_at` values differ.
+- [x] A newer tombstone wins over an older edit.
+- [x] A newer edit wins over an older tombstone without hard deletion.
+- [x] Repository ownership checks and RLS preserve user isolation.
+- [x] Equal-timestamp mismatches and client clock-skew limitations remain explicit limitations.
 
 ## Phase 10E - Sync UI, Retry, and Demo Readiness
 

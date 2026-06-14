@@ -54,6 +54,26 @@ export class RemoteCategoryRepository {
     return mapCategoryRow(response.data);
   }
 
+  async findCategoryById(
+    userId: string,
+    categoryId: string
+  ): Promise<RemoteCategoryRow | null> {
+    await assertAuthenticatedOwner(userId);
+
+    const { data, error } = await remoteDatabase
+      .from('categories')
+      .select(CATEGORY_COLUMNS)
+      .eq('user_id', userId)
+      .eq('id', categoryId)
+      .maybeSingle();
+
+    if (error) {
+      throwRemoteRepositoryError('findById', 'category', categoryId, error);
+    }
+
+    return data ? mapCategoryRow(data as Record<string, unknown>) : null;
+  }
+
   async findCategoriesUpdatedAfter(
     userId: string,
     updatedAfter: string

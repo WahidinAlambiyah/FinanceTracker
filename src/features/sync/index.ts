@@ -18,3 +18,7 @@ export * from './push-sync.types';
 export * from './push-sync.service';
 export * from './pull-sync.types';
 export * from './pull-sync.service';
+export * from './conflict-resolution.types';
+export * from './conflict-resolution';
+export * from './convergence-sync.types';
+export * from './convergence-sync.service';
