@@ -41,6 +41,5 @@ yarn-error.*
 /ios
 /android
 
-tmp-*.mjs
 # Temporary local verification scripts
 tmp-*.mjs
