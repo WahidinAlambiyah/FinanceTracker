@@ -151,13 +151,17 @@ Decisions needed:
    - User manually tests RLS with two users.
    - Follow `docs/sql/PHASE9C_MANUAL_APPLY_AND_RLS_TEST.md`.
 
-4. Phase 10: Push sync
-   - Add remote repositories and sync queue processor.
-   - Mark local records synced only after successful remote writes.
+4. Phase 10: Full Sync MVP
+   - 10A remote repositories.
+   - 10B push sync.
+   - 10C pull sync.
+   - 10D conflict handling and multi-device convergence.
+   - 10E sync UI, retry, and demo readiness.
+   - See `PHASE10_FULL_SYNC_MVP_PLAN.md`.
 
-5. Phase 11: Pull sync
-   - Pull remote changes since `last_sync_at`.
-   - Apply last-write-wins MVP conflict strategy.
+5. Phase 11: Post-MVP hardening
+   - Advanced sync hardening, diagnostics, background scheduling, cleanup, or release readiness.
+   - Exact scope requires a separate approved plan.
 
 ## 10. Files Likely To Be Changed Later
 

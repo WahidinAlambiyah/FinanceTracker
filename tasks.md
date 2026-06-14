@@ -488,7 +488,52 @@
 
 ---
 
-## Phase 10 — Push Sync
+## Phase 10 — Full Sync MVP
+
+- [x] 10.0 Prepare Full Sync MVP implementation plan
+  - Plan file: `PHASE10_FULL_SYNC_MVP_PLAN.md`.
+  - Documentation only; Phase 10 implementation has not started.
+
+### Phase 10A — Remote Repositories
+
+- [ ] 10A.1 Create remote repository types and field mappings
+- [ ] 10A.2 Create remote profile repository/bootstrap if needed
+- [ ] 10A.3 Create remote wallet repository
+- [ ] 10A.4 Create remote category repository
+- [ ] 10A.5 Create remote transaction repository
+
+### Phase 10B — Push Sync
+
+- [ ] 10B.1 Process current-user pending and eligible failed queue items
+- [ ] 10B.2 Push canonical SQLite records in dependency order
+- [ ] 10B.3 Synchronize deletes through `deleted_at` tombstones
+- [ ] 10B.4 Mark queue success only after confirmed remote write
+- [ ] 10B.5 Recover failures and stale processing entries safely
+
+### Phase 10C — Pull Sync
+
+- [ ] 10C.1 Pull remote changes since the per-user `last_sync_at`
+- [ ] 10C.2 Apply remote rows and tombstones to SQLite in dependency order
+- [ ] 10C.3 Preserve newer pending local changes
+- [ ] 10C.4 Advance cursor only after the full sync cycle succeeds
+
+### Phase 10D — Conflict Handling and Multi-Device
+
+- [ ] 10D.1 Implement Last Write Wins using `updated_at`
+- [ ] 10D.2 Treat `deleted_at` as a versioned change
+- [ ] 10D.3 Test bidirectional Device A/Device B convergence
+- [ ] 10D.4 Verify authenticated cross-user isolation during sync
+
+### Phase 10E — Sync UI, Retry, and Demo Readiness
+
+- [ ] 10E.1 Add guarded manual sync action in Settings
+- [ ] 10E.2 Display syncing, success, pending, failed, and offline states
+- [ ] 10E.3 Add non-overlapping retry/foreground/connectivity triggers
+- [ ] 10E.4 Complete offline, retry, conflict, and multi-device demo checklist
+
+### Legacy Phase 10 Checklist (Superseded)
+
+The checklist below was written for the former push-only Phase 10 scope. Do not use it for implementation tracking; use the approved 10A-10E checklist above. It is retained temporarily for requirements traceability until documentation cleanup is separately approved.
 
 - [ ] 10.1 Create remote repositories
   - Remote wallet repository.
@@ -527,7 +572,9 @@
 
 ---
 
-## Phase 11 — Pull Sync
+## Phase 11 — Post-MVP Sync Hardening and Release Readiness
+
+**Scope note**: Pull sync moved to Phase 10C. Any legacy pull-sync checklist retained below is superseded and must not be treated as the active Phase 11 plan. Phase 11 requires a separate approved hardening/release-readiness plan.
 
 - [ ] 11.1 Implement remote query updated after timestamp
   - Wallets updated after last_sync_at.

@@ -184,12 +184,12 @@ Any unexpected access is a failure. Stop and review the schema, grants, and poli
 
 ## 8. Next Step After Phase 9C Passes
 
-After Phase 9C is manually executed, tested, documented, and explicitly approved, plan Phase 10A as minimal push sync:
+After Phase 9C is manually executed, tested, documented, and explicitly approved, follow `PHASE10_FULL_SYNC_MVP_PLAN.md`:
 
-- Process local pending queue items asynchronously.
-- Upsert local wallet/category/transaction changes to Supabase.
-- Preserve SQLite-first reads and writes.
-- Use soft deletes remotely.
-- Do not implement pull sync yet; pull remains Phase 11.
+- 10A remote repositories.
+- 10B push sync.
+- 10C pull sync.
+- 10D conflict handling and multi-device convergence.
+- 10E sync UI, retry, and demo readiness.
 
-This guide does not approve or start Phase 10A.
+SQLite remains the runtime source of truth throughout Phase 10. This guide does not start Phase 10A implementation.
