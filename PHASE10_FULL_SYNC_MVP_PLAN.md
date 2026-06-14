@@ -4,6 +4,8 @@
 **Scope**: Full MVP sync across Phase 10A-10E  
 **Architecture**: SQLite remains the runtime source of truth; Supabase is remote persistence only
 
+**Phase 10A Status**: Remote repository layer implemented. Push/pull orchestration, conflict handling, and sync UI have not started.
+
 ## Preconditions Before Phase 10A
 
 Do not start Phase 10A until all items are confirmed:
@@ -69,12 +71,12 @@ Responsibilities:
 
 **Definition of done:**
 
-- [ ] Repository interfaces and remote row types are defined.
-- [ ] All repositories target the `financetracker` schema.
-- [ ] Owned upsert and incremental read operations work through authenticated RLS.
-- [ ] Soft-deleted rows are readable for synchronization.
-- [ ] No orchestration, automatic sync, or UI behavior is introduced yet.
-- [ ] Existing SQLite-first runtime behavior remains unchanged.
+- [x] Repository interfaces and remote row types are defined.
+- [x] All repositories target the `financetracker` schema.
+- [x] Owned upsert and incremental read operations are implemented for authenticated RLS.
+- [x] Incremental reads include soft-deleted rows.
+- [x] No orchestration, automatic sync, or UI behavior is introduced yet.
+- [x] Existing SQLite-first runtime behavior remains unchanged.
 
 ## Phase 10B - Push Sync
 

@@ -496,11 +496,13 @@
 
 ### Phase 10A — Remote Repositories
 
-- [ ] 10A.1 Create remote repository types and field mappings
-- [ ] 10A.2 Create remote profile repository/bootstrap if needed
-- [ ] 10A.3 Create remote wallet repository
-- [ ] 10A.4 Create remote category repository
-- [ ] 10A.5 Create remote transaction repository
+- [x] 10A.1 Create remote repository types and field mappings
+- [x] 10A.2 Create remote profile repository/bootstrap if needed
+- [x] 10A.3 Create remote wallet repository
+- [x] 10A.4 Create remote category repository
+- [x] 10A.5 Create remote transaction repository
+
+**Phase 10A Status**: Remote repository layer implemented only. Manual authenticated Supabase verification remains required. Phase 10B-10E have not started.
 
 ### Phase 10B — Push Sync
 
