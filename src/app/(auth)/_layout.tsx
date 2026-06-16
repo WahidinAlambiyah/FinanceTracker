@@ -1,0 +1,22 @@
+/**
+ * Auth Group Layout
+ * 
+ * Layout for authentication screens (login, register).
+ * These screens do not require authentication.
+ */
+
+import { Stack } from 'expo-router';
+
+export default function AuthLayout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: '#F8FAFC' },
+      }}
+    >
+      <Stack.Screen name="login" />
+      <Stack.Screen name="register" />
+    </Stack>
+  );
+}

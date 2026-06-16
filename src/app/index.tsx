@@ -1,13 +1,35 @@
-import { View, Text, StyleSheet } from 'react-native';
+/**
+ * App Entry Point
+ * 
+ * Handles authentication-based routing:
+ * - If not authenticated: Redirect to /login
+ * - If authenticated: Redirect to /(tabs)/dashboard
+ * 
+ * This replaces the Phase 1 debug screen.
+ */
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Finance Tracker</Text>
-      <Text style={styles.subtitle}>Offline-First Financial Management</Text>
-      <Text style={styles.info}>Project setup complete ✓</Text>
-    </View>
-  );
+import { Redirect } from 'expo-router';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { useAuth } from '../features/auth';
+
+export default function Index() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Show loading while checking auth state
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
+  }
+
+  // Redirect based on auth state
+  if (isAuthenticated) {
+    return <Redirect href="/(tabs)/dashboard" />;
+  }
+
+  return <Redirect href="/(auth)/login" />;
 }
 
 const styles = StyleSheet.create({
@@ -15,21 +37,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-  },
-  info: {
-    fontSize: 14,
-    color: '#4CAF50',
+    backgroundColor: '#F8FAFC',
   },
 });
