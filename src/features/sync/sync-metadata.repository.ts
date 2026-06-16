@@ -5,8 +5,7 @@
  * Uses existing sync_metadata table from Phase 1 schema.
  * 
  * Phase 8: Storage foundation only (no sync processing)
- * Phase 10: Store last_sync_at after successful push sync
- * Phase 11: Store last_sync_at after successful pull sync
+ * Phase 10E: Store per-user last_sync_at after successful convergence
  */
 
 import type { SQLiteDatabase } from 'expo-sqlite';

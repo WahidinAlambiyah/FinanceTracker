@@ -3,13 +3,13 @@
  * 
  * User settings and account management.
  * Currently shows user info and logout functionality.
- * Phase 8: Added sync status display (network state, queue counts)
+ * Phase 10E: Manual convergence sync and user-facing status/retry states
  * More settings will be added in Phase 12.
  * 
  * Requirements: REQ-AUTH-003
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -21,42 +21,43 @@ import {
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
-import { getDatabase } from '@/lib/db';
-import { getSyncQueueRepository } from '@/features/sync';
+import { manualSyncService } from '@/features/sync';
+import type { ManualSyncOutcome, ManualSyncStatus } from '@/features/sync';
 import { getNetworkService } from '@/lib/network/network.service';
+import { formatIndonesianDateTime } from '@/lib/utils/date';
+import { logger } from '@/lib/utils/logger';
 import { SyncStatusBadge } from '@/components/finance/SyncStatusBadge';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [failedCount, setFailedCount] = useState(0);
+  const [syncStatus, setSyncStatus] = useState<ManualSyncStatus>({
+    isOnline: true,
+    lastSyncAt: null,
+    pendingCount: 0,
+    failedCount: 0,
+  });
   const [isLoadingSyncStatus, setIsLoadingSyncStatus] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncOutcome, setSyncOutcome] = useState<ManualSyncOutcome | null>(null);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const syncRunGuard = useRef(false);
 
-  /**
-   * Load sync status from local SQLite (Phase 8)
-   */
+  /** Load current-user sync status from local SQLite. */
   const loadSyncStatus = useCallback(async () => {
+    if (!user) {
+      setIsLoadingSyncStatus(false);
+      return;
+    }
+
     try {
-      const db = await getDatabase();
-      const syncQueueRepo = getSyncQueueRepository(db);
-
-      const pending = await syncQueueRepo.countByStatus('pending');
-      const failed = await syncQueueRepo.countByStatus('failed');
-
-      setPendingCount(pending);
-      setFailedCount(failed);
-
-      const networkService = getNetworkService();
-      const online = await networkService.isOnline();
-      setIsOnline(online);
-    } catch (error) {
-      console.error('Failed to load sync status:', error);
+      setSyncStatus(await manualSyncService.getStatus(user.id));
+    } catch {
+      logger.warn('Failed to load sync status', { code: 'STATUS_LOAD_FAILED' });
     } finally {
       setIsLoadingSyncStatus(false);
     }
-  }, []);
+  }, [user]);
 
   /**
    * Subscribe to network state (Phase 8)
@@ -65,7 +66,9 @@ export default function SettingsScreen() {
     const networkService = getNetworkService();
 
     // Subscribe to network state changes
-    const unsubscribe = networkService.subscribeToNetworkState(setIsOnline);
+    const unsubscribe = networkService.subscribeToNetworkState((isOnline) => {
+      setSyncStatus((current) => ({ ...current, isOnline }));
+    });
 
     return unsubscribe;
   }, []);
@@ -120,6 +123,32 @@ export default function SettingsScreen() {
     );
   }
 
+  async function handleSyncNow() {
+    if (!user || syncRunGuard.current) return;
+
+    syncRunGuard.current = true;
+    setIsSyncing(true);
+    setSyncOutcome(null);
+    setSyncMessage(null);
+    try {
+      const result = await manualSyncService.syncNow(user.id);
+      setSyncStatus(result.status);
+      setSyncOutcome(result.outcome);
+      setSyncMessage(result.message);
+      Alert.alert('Sync Status', result.message);
+    } catch {
+      const message = 'Sync could not be completed. Please try again.';
+      logger.warn('Manual sync UI failed', { code: 'MANUAL_SYNC_FAILED' });
+      setSyncOutcome('failed');
+      setSyncMessage(message);
+      Alert.alert('Sync Status', message);
+      await loadSyncStatus();
+    } finally {
+      syncRunGuard.current = false;
+      setIsSyncing(false);
+    }
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -142,7 +171,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Sync Status Section (Phase 8) */}
+        {/* Sync Status Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Sync Status</Text>
           
@@ -157,7 +186,7 @@ export default function SettingsScreen() {
                 <View style={styles.syncRow}>
                   <Text style={styles.syncLabel}>Network</Text>
                   <SyncStatusBadge
-                    status={isOnline ? 'online' : 'offline'}
+                    status={syncStatus.isOnline ? 'online' : 'offline'}
                     size="small"
                     showLabel={true}
                   />
@@ -165,10 +194,13 @@ export default function SettingsScreen() {
 
                 <View style={styles.separator} />
 
-                {/* Last Sync (Placeholder for Phase 10) */}
                 <View style={styles.syncRow}>
-                  <Text style={styles.syncLabel}>Last Sync</Text>
-                  <Text style={styles.syncValue}>Never synced</Text>
+                  <Text style={styles.syncLabel}>Last successful sync</Text>
+                  <Text style={styles.syncValue}>
+                    {syncStatus.lastSyncAt
+                      ? formatIndonesianDateTime(syncStatus.lastSyncAt)
+                      : 'Never synced'}
+                  </Text>
                 </View>
 
                 <View style={styles.separator} />
@@ -177,7 +209,8 @@ export default function SettingsScreen() {
                 <View style={styles.syncRow}>
                   <Text style={styles.syncLabel}>Pending local queue</Text>
                   <Text style={styles.syncValue}>
-                    {pendingCount} {pendingCount === 1 ? 'item' : 'items'}
+                    {syncStatus.pendingCount}{' '}
+                    {syncStatus.pendingCount === 1 ? 'item' : 'items'}
                   </Text>
                 </View>
 
@@ -186,14 +219,52 @@ export default function SettingsScreen() {
                 {/* Failed Items */}
                 <View style={styles.syncRow}>
                   <Text style={styles.syncLabel}>Failed</Text>
-                  <Text style={[styles.syncValue, failedCount > 0 && styles.syncValueFailed]}>
-                    {failedCount} {failedCount === 1 ? 'item' : 'items'}
+                  <Text
+                    style={[
+                      styles.syncValue,
+                      syncStatus.failedCount > 0 && styles.syncValueFailed,
+                    ]}
+                  >
+                    {syncStatus.failedCount}{' '}
+                    {syncStatus.failedCount === 1 ? 'item' : 'items'}
                   </Text>
                 </View>
 
                 <Text style={styles.syncHint}>
-                  Queue counts are device-local and not user-filtered yet.
+                  Queue counts are device-local for this account.
                 </Text>
+
+                {(isSyncing || syncMessage) && (
+                  <View
+                    style={[
+                      styles.syncResult,
+                      syncOutcome === 'success' && styles.syncResultSuccess,
+                      syncOutcome === 'partial' && styles.syncResultPartial,
+                      (syncOutcome === 'failed' || syncOutcome === 'auth_required')
+                        && styles.syncResultFailed,
+                      syncOutcome === 'offline' && styles.syncResultOffline,
+                    ]}
+                  >
+                    <Text style={styles.syncResultText}>
+                      {isSyncing ? 'Syncing...' : syncMessage}
+                    </Text>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  style={[
+                    styles.syncButton,
+                    isSyncing && styles.syncButtonDisabled,
+                  ]}
+                  onPress={handleSyncNow}
+                  disabled={isSyncing}
+                >
+                  {isSyncing ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.syncButtonText}>Sync Now</Text>
+                  )}
+                </TouchableOpacity>
 
               </>
             )}
@@ -223,7 +294,6 @@ export default function SettingsScreen() {
             <Text style={styles.placeholderText}>
               Additional settings coming in Phase 12:
             </Text>
-            <Text style={styles.placeholderItem}>• Manual sync button</Text>
             <Text style={styles.placeholderItem}>• Export data (CSV)</Text>
             <Text style={styles.placeholderItem}>• App lock (PIN/biometric)</Text>
           </View>
@@ -321,6 +391,45 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontStyle: 'italic',
     marginTop: 12,
+  },
+  syncResult: {
+    marginTop: 16,
+    borderRadius: 8,
+    backgroundColor: '#EFF6FF',
+    padding: 12,
+  },
+  syncResultSuccess: {
+    backgroundColor: '#F0FDF4',
+  },
+  syncResultPartial: {
+    backgroundColor: '#FFFBEB',
+  },
+  syncResultFailed: {
+    backgroundColor: '#FEF2F2',
+  },
+  syncResultOffline: {
+    backgroundColor: '#F1F5F9',
+  },
+  syncResultText: {
+    fontSize: 13,
+    color: '#0F172A',
+    fontWeight: '500',
+  },
+  syncButton: {
+    marginTop: 16,
+    borderRadius: 8,
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  syncButtonDisabled: {
+    backgroundColor: '#94A3B8',
+  },
+  syncButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   settingRow: {
     flexDirection: 'row',

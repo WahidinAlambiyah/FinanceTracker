@@ -22,3 +22,8 @@ export const SYNC_METADATA_KEYS = {
   LAST_SYNC_ERROR: 'last_sync_error',     // Error message if failed (Phase 10)
   LAST_PULL_AT: 'last_pull_at',           // ISO timestamp of last pull sync (Phase 11)
 } as const;
+
+/** Keep full-sync cursors isolated between accounts on the same device. */
+export function getLastSyncAtKey(userId: string): string {
+  return `${SYNC_METADATA_KEYS.LAST_SYNC_AT}:${userId}`;
+}

@@ -22,3 +22,5 @@ export * from './conflict-resolution.types';
 export * from './conflict-resolution';
 export * from './convergence-sync.types';
 export * from './convergence-sync.service';
+export * from './manual-sync.types';
+export * from './manual-sync.service';

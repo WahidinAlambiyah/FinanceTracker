@@ -534,10 +534,12 @@
 
 ### Phase 10E — Sync UI, Retry, and Demo Readiness
 
-- [ ] 10E.1 Add guarded manual sync action in Settings
-- [ ] 10E.2 Display syncing, success, pending, failed, and offline states
-- [ ] 10E.3 Add non-overlapping retry/foreground/connectivity triggers
+- [x] 10E.1 Add guarded manual sync action in Settings
+- [x] 10E.2 Display online/offline, never/last synced, syncing, success, partial, pending, and failed states
+- [x] 10E.3 Add non-overlapping manual retry using current-user queue counts and an overlap-safe cursor
 - [ ] 10E.4 Complete offline, retry, conflict, and multi-device demo checklist
+
+**Phase 10E Status**: Manual Settings sync is implemented using `convergenceSyncService`, with per-user `last_sync_at`, a five-minute overlap window, current-user device-local queue counts, safe user messages, and repeatable manual retry. No background, app-start, foreground, or connectivity-triggered sync was added. Manual demo verification remains required before Phase 10 is closed.
 
 ### Legacy Phase 10 Checklist (Superseded)
 

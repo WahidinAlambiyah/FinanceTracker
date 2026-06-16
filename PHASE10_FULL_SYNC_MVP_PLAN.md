@@ -1,6 +1,6 @@
 # Phase 10 Full Sync MVP Plan
 
-**Status**: Plan prepared; implementation not started  
+**Status**: Phase 10A-10D verified; Phase 10E implemented and awaiting manual verification  
 **Scope**: Full MVP sync across Phase 10A-10E  
 **Architecture**: SQLite remains the runtime source of truth; Supabase is remote persistence only
 
@@ -11,6 +11,8 @@
 **Phase 10C Status**: Explicit pull sync service implemented. It skips rows with unsynced local queue work and returns the maximum observed remote timestamp without advancing `last_sync_at`. Conflict resolution and UI/automatic triggers have not started.
 
 **Phase 10D Status**: Explicit LWW convergence service implemented. It performs conflict-aware queue processing before pull, settles deterministic local/remote/equivalent outcomes, preserves equal-timestamp mismatches as unresolved, and never hard deletes. It does not advance `last_sync_at` and is not wired to UI or automatic triggers.
+
+**Phase 10E Status**: Production manual sync UI is implemented in Settings using the convergence service. It includes current-user device-local counts, safe result states, manual retry, guarded concurrency, and per-user successful-sync metadata. No background, app-start, foreground, or connectivity-triggered sync was added.
 
 ## Preconditions Before Phase 10A
 
@@ -162,18 +164,25 @@ Responsibilities:
 - Add a Settings `Sync Now` action.
 - Display online/offline, syncing, success, pending, and failed states.
 - Display the last successful full-sync timestamp.
-- Prevent overlapping manual, foreground, and connectivity-triggered cycles.
+- Prevent overlapping manual cycles. Automatic foreground/connectivity triggers are outside Phase 10E scope.
 - Retry eligible failed queue items without blocking local usage.
 - Refresh displayed data from SQLite after sync completion.
 
 **Definition of done:**
 
-- [ ] Manual sync cannot start concurrent cycles.
-- [ ] Status and pending/failed counts reflect the current user.
-- [ ] Offline sync attempts return a non-blocking user-friendly result.
-- [ ] Auth, RLS, network, and partial-cycle failures are distinguishable in logs.
-- [ ] Dashboard and reports remain SQLite-first and formulas are unchanged.
+- [x] Manual sync cannot start concurrent cycles.
+- [x] Status and pending/failed counts reflect the current user.
+- [x] Offline sync attempts return a non-blocking user-friendly result.
+- [x] Auth, RLS, network, and partial-cycle failures are distinguishable in logs.
+- [x] Dashboard and reports remain SQLite-first and formulas are unchanged.
 - [ ] Full demo flow works across two authenticated devices/users as applicable.
+
+### Cursor and Retry Behavior
+
+- `last_sync_at` is stored per user and changes only when convergence returns `success = true`, `failedCount = 0`, and `unresolvedCount = 0`.
+- A subsequent pull starts five minutes before the stored cursor. This overlap intentionally replays a small idempotent window so exact timestamp boundaries and writes racing with the previous pull are not missed.
+- The initial pull uses the Unix epoch when no successful cursor exists.
+- Tapping `Sync Now` retries current-user pending and failed queue items. Failures remain local and no financial record is deleted.
 
 ## Error Handling
 
@@ -199,12 +208,22 @@ Expected targeted modifications:
 - Sync queue repository for current-user filtering, recovery, retry, and superseding entries.
 - Sync metadata repository for per-user cursor/status keys.
 - Settings screen for manual sync and status.
-- Authenticated app lifecycle/network integration for guarded sync triggers.
+- Network subscription for status display only; no lifecycle or connectivity sync trigger is included.
 - Phase documentation and `tasks.md` after each approved subphase.
 
 No dashboard/report calculation repository should change.
 
 ## Manual Test Checklist
+
+### Phase 10E Demo Readiness
+
+- [ ] Open Settings and confirm Online/Offline, Never synced/last sync time, and current-account device-local pending/failed counts.
+- [ ] Tap `Sync Now` rapidly and confirm only one run starts and the button remains disabled while syncing.
+- [ ] Complete an online sync and confirm `Sync completed`, refreshed counts, and a new last-sync time.
+- [ ] Attempt sync offline and confirm `You're offline`, unchanged queue data, and unchanged last-sync time.
+- [ ] Expire/sign out the session and confirm `Please sign in again` without exposing technical details.
+- [ ] Force a partial/failed remote operation and confirm `Some items still need attention` or a safe failed result, unchanged last-sync time, and successful retry after recovery.
+- [ ] Sync two devices and confirm replay overlap causes no duplicates and remote changes converge into SQLite-backed screens.
 
 - [ ] Create, edit, and soft delete while offline; confirm SQLite changes immediately.
 - [ ] Reconnect and push all pending changes.
