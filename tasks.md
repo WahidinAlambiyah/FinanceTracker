@@ -537,9 +537,42 @@
 - [x] 10E.1 Add guarded manual sync action in Settings
 - [x] 10E.2 Display online/offline, never/last synced, syncing, success, partial, pending, and failed states
 - [x] 10E.3 Add non-overlapping manual retry using current-user queue counts and an overlap-safe cursor
-- [ ] 10E.4 Complete offline, retry, conflict, and multi-device demo checklist
+- [x] 10E.4 Complete offline, retry, conflict, and multi-device demo checklist
 
-**Phase 10E Status**: Manual Settings sync is implemented using `convergenceSyncService`, with per-user `last_sync_at`, a five-minute overlap window, current-user device-local queue counts, safe user messages, and repeatable manual retry. No background, app-start, foreground, or connectivity-triggered sync was added. Manual demo verification remains required before Phase 10 is closed.
+**Phase 10E Status**: Manual Settings sync is implemented and manually verified using `convergenceSyncService`, with per-user `last_sync_at`, a five-minute overlap window, current-user device-local queue counts, safe user messages, and repeatable manual retry. No background, app-start, foreground, or connectivity-triggered sync was added. Manual demo verification passed.
+
+**Phase 10 Final Status**: Phase 10 Full Sync MVP is verified and closed. Remote repositories, push sync, pull sync, conflict-aware convergence, manual `Sync Now`, offline behavior, retry behavior, user isolation, no-hard-delete behavior, and `last_sync_at` behavior were manually verified. `npx tsc --noEmit` passed.
+
+### Phase 11 — Post-MVP Sync Hardening and Release Readiness
+
+The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-row upsert, LWW conflict handling, and the full manual sync flow were completed in Phase 10C, 10D, and 10E. Do not implement the old Phase 11.1-11.5 checklist as active code work.
+
+- [x] 11A.1 Close Phase 10 documentation after manual verification
+- [x] 11A.2 Supersede legacy Phase 11 pull-sync checklist
+- [x] 11A.3 Create `PHASE11_HARDENING_RELEASE_READINESS_PLAN.md`
+- [ ] 11B.1 Review `last_sync_at` behavior
+- [ ] 11B.2 Review retry behavior
+- [ ] 11B.3 Review stale queue handling
+- [ ] 11B.4 Review duplicate queue and replay behavior
+- [ ] 11B.5 Review safe user-facing messages
+- [ ] 11C.1 Validate wallet/category/transaction CRUD after sync
+- [ ] 11C.2 Validate dashboard/report formulas remain unchanged
+- [ ] 11C.3 Validate transfers after sync
+- [ ] 11C.4 Validate tombstones
+- [ ] 11C.5 Validate app restart persistence
+- [ ] 11D.1 Validate offline create/edit/delete
+- [ ] 11D.2 Validate reconnect and `Sync Now`
+- [ ] 11D.3 Validate two-device convergence
+- [ ] 11D.4 Validate expired session behavior
+- [ ] 11D.5 Validate RLS isolation
+- [ ] 11E.1 Remove obsolete documentation wording
+- [ ] 11E.2 Ensure no temporary DEV buttons/scripts remain
+- [ ] 11E.3 Ensure `.env.example` is safe
+- [ ] 11E.4 Ensure no secrets or local test files are committed
+- [ ] 11E.5 Document lint/typecheck checklist
+- [ ] 11E.6 Prepare demo script
+
+**Phase 11A Status**: Planning and Phase 10 closure documentation completed only. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
@@ -584,7 +617,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 
 ## Phase 11 — Post-MVP Sync Hardening and Release Readiness
 
-**Scope note**: Pull sync moved to Phase 10C. Any legacy pull-sync checklist retained below is superseded and must not be treated as the active Phase 11 plan. Phase 11 requires a separate approved hardening/release-readiness plan.
+**Legacy scope note**: Pull sync moved to Phase 10C. The checklist retained below is superseded and must not be treated as the active Phase 11 plan. The active Phase 11 plan is now **Phase 11 — Post-MVP Sync Hardening and Release Readiness**, with details in `PHASE11_HARDENING_RELEASE_READINESS_PLAN.md`.
 
 - [ ] 11.1 Implement remote query updated after timestamp
   - Wallets updated after last_sync_at.
