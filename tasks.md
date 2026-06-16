@@ -583,6 +583,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 
 **Phase 11C Partial QA Status**: Wallet, category, and transaction CRUD after sync passed manual QA (`11C-WALLET-01` through `11C-TRX-03`). Transfer integrity, dashboard/report formula integrity, comprehensive tombstone verification, app restart persistence, and user isolation were intentionally skipped and remain pending.
 
+**Phase 11C Bugfix Note**: `11C-TRANSFER-01` found a valid UI bug: Wallets screen displayed `opening_balance` instead of derived/current wallet balance after transfers. A small Wallets screen patch now reuses `getWalletBalances(userId)` from the dashboard feature and keeps the existing derived formula unchanged. `11C.3` remains open until transfer retest passes.
+
 ### Legacy Phase 10 Checklist (Superseded)
 
 The checklist below was written for the former push-only Phase 10 scope. Do not use it for implementation tracking; use the approved 10A-10E checklist above. It is retained temporarily for requirements traceability until documentation cleanup is separately approved.

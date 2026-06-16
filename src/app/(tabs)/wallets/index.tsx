@@ -18,12 +18,14 @@ import {
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { getWallets, deleteWallet } from '@/features/wallets';
+import { getWalletBalances } from '@/features/dashboard';
 import { formatRupiah } from '@/lib/utils/money';
 import type { Wallet } from '@/features/wallets';
 
 export default function WalletsScreen() {
   const { user } = useAuth();
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [walletBalances, setWalletBalances] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -34,10 +36,25 @@ export default function WalletsScreen() {
     if (!user) return;
 
     try {
-      const result = await getWallets(user.id);
+      const [result, balancesResult] = await Promise.all([
+        getWallets(user.id),
+        getWalletBalances(user.id),
+      ]);
 
       if (result.success && result.data) {
         setWallets(result.data);
+        if (balancesResult.success && balancesResult.data) {
+          const balancesByWalletId = balancesResult.data.reduce<Record<string, number>>(
+            (acc, walletBalance) => {
+              acc[walletBalance.wallet_id] = walletBalance.balance;
+              return acc;
+            },
+            {}
+          );
+          setWalletBalances(balancesByWalletId);
+        } else {
+          setWalletBalances({});
+        }
       } else {
         Alert.alert('Error', result.error || 'Failed to load wallets');
       }
@@ -156,29 +173,31 @@ export default function WalletsScreen() {
   /**
    * Render wallet card
    */
-  const renderWalletCard = ({ item }: { item: Wallet }) => (
-    <TouchableOpacity
-      style={styles.walletCard}
-      onPress={() => handleEditWallet(item.id)}
-      onLongPress={() => handleDeleteWallet(item)}
-    >
-      <View style={styles.walletCardHeader}>
-        <View style={styles.walletCardTitle}>
-          <Text style={styles.walletName}>{item.name}</Text>
-          {renderWalletTypeBadge(item.type)}
+  const renderWalletCard = ({ item }: { item: Wallet }) => {
+    const currentBalance = walletBalances[item.id] ?? item.opening_balance;
+
+    return (
+      <TouchableOpacity
+        style={styles.walletCard}
+        onPress={() => handleEditWallet(item.id)}
+        onLongPress={() => handleDeleteWallet(item)}
+      >
+        <View style={styles.walletCardHeader}>
+          <View style={styles.walletCardTitle}>
+            <Text style={styles.walletName}>{item.name}</Text>
+            {renderWalletTypeBadge(item.type)}
+          </View>
+          {renderSyncStatus(item.sync_status)}
         </View>
-        {renderSyncStatus(item.sync_status)}
-      </View>
 
-      <Text style={styles.walletBalance}>{formatRupiah(item.opening_balance)}</Text>
+        <Text style={styles.walletBalance}>{formatRupiah(currentBalance)}</Text>
 
-      {!item.sync_status || item.sync_status === 'pending' || item.sync_status === 'failed' ? null : (
         <Text style={styles.walletHelper}>
-          Current balance calculation will be added after transactions are implemented.
+          Current balance is calculated from transactions.
         </Text>
-      )}
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   /**
    * Render empty state
