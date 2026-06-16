@@ -550,11 +550,11 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11A.1 Close Phase 10 documentation after manual verification
 - [x] 11A.2 Supersede legacy Phase 11 pull-sync checklist
 - [x] 11A.3 Create `PHASE11_HARDENING_RELEASE_READINESS_PLAN.md`
-- [ ] 11B.1 Review `last_sync_at` behavior
-- [ ] 11B.2 Review retry behavior
-- [ ] 11B.3 Review stale queue handling
-- [ ] 11B.4 Review duplicate queue and replay behavior
-- [ ] 11B.5 Review safe user-facing messages
+- [x] 11B.1 Review `last_sync_at` behavior
+- [x] 11B.2 Review retry behavior
+- [x] 11B.3 Review stale queue handling
+- [x] 11B.4 Review duplicate queue and replay behavior
+- [x] 11B.5 Review safe user-facing messages
 - [ ] 11C.1 Validate wallet/category/transaction CRUD after sync
 - [ ] 11C.2 Validate dashboard/report formulas remain unchanged
 - [ ] 11C.3 Validate transfers after sync
@@ -573,6 +573,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [ ] 11E.6 Prepare demo script
 
 **Phase 11A Status**: Planning and Phase 10 closure documentation completed only. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed.
+
+**Phase 11B Status**: Sync hardening review completed in `docs/reviews/PHASE11B_SYNC_HARDENING_REVIEW.md`. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed. Review found no blockers or high-severity issues; one medium cursor-hardening tiny patch is recommended before Phase 11C.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
