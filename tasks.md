@@ -555,6 +555,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11B.3 Review stale queue handling
 - [x] 11B.4 Review duplicate queue and replay behavior
 - [x] 11B.5 Review safe user-facing messages
+- [x] 11C.0 Create data integrity QA checklist and evidence template
 - [ ] 11C.1 Validate wallet/category/transaction CRUD after sync
 - [ ] 11C.2 Validate dashboard/report formulas remain unchanged
 - [ ] 11C.3 Validate transfers after sync
@@ -577,6 +578,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11B Status**: Sync hardening review completed in `docs/reviews/PHASE11B_SYNC_HARDENING_REVIEW.md`. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed. Review found no blockers or high-severity issues; one medium cursor-hardening tiny patch is recommended before Phase 11C.
 
 **Phase 11B Patch Note**: Cursor hardening patch applied. Manual sync now records the sync-cycle start timestamp as `last_sync_at` after complete convergence success, preserving the existing five-minute overlap and success-only advancement gate. Phase 11C/11D/11E remain open.
+
+**Phase 11C Documentation Status**: Data integrity QA checklist and evidence template created in `docs/qa/PHASE11C_DATA_INTEGRITY_QA.md`. Manual validation items remain pending until actual QA results are provided.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
