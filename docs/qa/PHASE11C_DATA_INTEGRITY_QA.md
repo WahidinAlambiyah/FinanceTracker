@@ -406,6 +406,35 @@ Steps:
 6. Sign back in as User A and run `Sync Now`.
 7. Confirm User B records do not appear in User A UI.
 
+## Manual Execution Result
+
+**Execution status**: Partial manual QA executed.  
+**Result summary**: Wallet, category, and transaction CRUD after sync passed. Transfer integrity, dashboard/report formula integrity, comprehensive tombstone verification, app restart persistence, and user isolation were intentionally skipped and remain pending.
+
+| Test ID | Area | Status | Notes |
+|---|---|---|---|
+| 11C-WALLET-01 | Wallet create push | PASS | Wallet create after sync validated. |
+| 11C-WALLET-02 | Wallet edit push/pull | PASS | Wallet edit sync path validated. |
+| 11C-WALLET-03 | Wallet soft delete | PASS | Wallet soft-delete sync path validated. |
+| 11C-CATEGORY-01 | Default categories stability | PASS | Default category stability validated. |
+| 11C-CATEGORY-02 | Custom category create/edit/delete | PASS | Custom category CRUD after sync validated. |
+| 11C-TRX-01 | Income transaction sync | PASS | Income transaction sync path validated. |
+| 11C-TRX-02 | Expense transaction sync | PASS | Expense transaction sync path validated. |
+| 11C-TRX-03 | Transaction edit and soft delete | PASS | Transaction edit and soft-delete sync path validated. |
+| 11C-TRANSFER-01 | Transfer integrity after sync | SKIP | Intentionally deferred; remains pending. |
+| 11C-FORMULA-01 | Dashboard and report formula integrity | SKIP | Intentionally deferred; remains pending. |
+| 11C-TOMBSTONE-01 | Tombstone integrity | SKIP | Comprehensive tombstone check intentionally deferred; remains pending. |
+| 11C-PERSIST-01 | App restart persistence | SKIP | Intentionally deferred; remains pending. |
+| 11C-ISO-01 | User isolation | SKIP | Intentionally deferred; remains pending. |
+
+Pending Phase 11C items:
+
+- Transfer integrity after sync.
+- Dashboard/report formula integrity.
+- Comprehensive tombstone integrity.
+- App restart persistence.
+- User isolation.
+
 ## Supabase SQL Helper Queries
 
 Use these as read-only verification helpers in Supabase SQL editor. Replace placeholders before running.

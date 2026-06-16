@@ -556,7 +556,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11B.4 Review duplicate queue and replay behavior
 - [x] 11B.5 Review safe user-facing messages
 - [x] 11C.0 Create data integrity QA checklist and evidence template
-- [ ] 11C.1 Validate wallet/category/transaction CRUD after sync
+- [x] 11C.1 Validate wallet/category/transaction CRUD after sync
 - [ ] 11C.2 Validate dashboard/report formulas remain unchanged
 - [ ] 11C.3 Validate transfers after sync
 - [ ] 11C.4 Validate tombstones
@@ -580,6 +580,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11B Patch Note**: Cursor hardening patch applied. Manual sync now records the sync-cycle start timestamp as `last_sync_at` after complete convergence success, preserving the existing five-minute overlap and success-only advancement gate. Phase 11C/11D/11E remain open.
 
 **Phase 11C Documentation Status**: Data integrity QA checklist and evidence template created in `docs/qa/PHASE11C_DATA_INTEGRITY_QA.md`. Manual validation items remain pending until actual QA results are provided.
+
+**Phase 11C Partial QA Status**: Wallet, category, and transaction CRUD after sync passed manual QA (`11C-WALLET-01` through `11C-TRX-03`). Transfer integrity, dashboard/report formula integrity, comprehensive tombstone verification, app restart persistence, and user isolation were intentionally skipped and remain pending.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
