@@ -421,7 +421,7 @@ Steps:
 | 11C-TRX-01 | Income transaction sync | PASS | Income transaction sync path validated. |
 | 11C-TRX-02 | Expense transaction sync | PASS | Expense transaction sync path validated. |
 | 11C-TRX-03 | Transaction edit and soft delete | PASS | Transaction edit and soft-delete sync path validated. |
-| 11C-TRANSFER-01 | Transfer integrity after sync | FAIL | Bug identified before patch: Wallets screen displayed `opening_balance` instead of derived/current balance, so wallet balances did not visually update after transfer. Retest required after Phase 11C bugfix. |
+| 11C-TRANSFER-01 | Transfer integrity after sync | PASS | Retest passed after Wallets screen derived balance patch. Source wallet decreases, destination wallet increases, transfer does not count as income/expense, and the existing balance formula remains unchanged. |
 | 11C-FORMULA-01 | Dashboard and report formula integrity | SKIP | Intentionally deferred; remains pending. |
 | 11C-TOMBSTONE-01 | Tombstone integrity | SKIP | Comprehensive tombstone check intentionally deferred; remains pending. |
 | 11C-PERSIST-01 | App restart persistence | SKIP | Intentionally deferred; remains pending. |
@@ -429,7 +429,6 @@ Steps:
 
 Pending Phase 11C items:
 
-- Transfer integrity after sync retest. Initial execution failed because Wallets screen displayed `opening_balance` instead of derived/current balance.
 - Dashboard/report formula integrity.
 - Comprehensive tombstone integrity.
 - App restart persistence.
