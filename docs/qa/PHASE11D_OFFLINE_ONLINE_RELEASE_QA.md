@@ -15,7 +15,7 @@ Validate release-critical offline and online workflows after Phase 11C data inte
 | 11D.1 | Offline create/edit/delete | PASS | Device/app was offline. Wallet/category/transaction create worked locally. Local edits worked offline. Delete/soft delete worked offline. UI updated from local SQLite. Settings pending local queue increased. App did not require Supabase for local offline operations. No crash observed. |
 | 11D.2 | Reconnect and `Sync Now` | PASS | Offline-created/edited/deleted data was preserved locally. Network was restored, `Sync Now` was run manually, pending local queue became 0, failed count remained 0, Supabase remote rows were created/updated correctly, deleted item remained tombstoned with `deleted_at`, no hard delete was observed, local UI stayed consistent, no duplicate local/remote data was created, and dashboard/report values remained consistent. |
 | 11D.3 | Two-device convergence | DEFERRED | Intentionally deferred due to test-device availability/time constraints. Not considered PASS. Must be retested before claiming full multi-device release readiness. |
-| 11D.4 | Expired session behavior | PENDING | Not executed yet. |
+| 11D.4 | Expired session behavior | DEFERRED | Intentionally deferred. Normal logout prevents access to Settings and cannot validate `Sync Now` expired-session behavior. Not considered PASS. Retest requires a safe way to invalidate the auth session while the app remains on a screen that can trigger `Sync Now`, or another approved QA strategy. |
 | 11D.5 | RLS isolation | PENDING | Not executed yet. |
 
 ## Evidence Template
@@ -70,5 +70,5 @@ Actual result:
 ## Pending Phase 11D Items
 
 - 11D.3 Two-device convergence is deferred, not passed. Retest is required before claiming full multi-device release readiness.
-- 11D.4 Expired session behavior.
+- 11D.4 Expired session behavior is deferred, not passed. Normal logout is not equivalent to expired-session `Sync Now` QA.
 - 11D.5 RLS isolation.
