@@ -562,7 +562,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11C.4 Validate tombstones
 - [x] 11C.5 Validate app restart persistence
 - [x] 11D.1 Validate offline create/edit/delete
-- [ ] 11D.2 Validate reconnect and `Sync Now`
+- [x] 11D.2 Validate reconnect and `Sync Now`
 - [ ] 11D.3 Validate two-device convergence
 - [ ] 11D.4 Validate expired session behavior
 - [ ] 11D.5 Validate RLS isolation
@@ -600,6 +600,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11C Status**: Phase 11C data integrity QA items `11C.1` through `11C.5` are complete. RLS/user isolation remains tracked under Phase 11D and is not marked complete here.
 
 **Phase 11D Offline QA Status**: `11D.1` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. Offline wallet/category/transaction create worked locally, local edits worked offline, soft deletes worked offline, UI updated from SQLite, pending local queue increased, Supabase was not required for local offline operations, and no crash was observed. `11D.2` through `11D.5` remain open.
+
+**Phase 11D Reconnect QA Status**: `11D.2` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. Offline-created/edited/deleted data was preserved locally, `Sync Now` after reconnect cleared pending queue to 0, failed count remained 0, Supabase rows were created/updated correctly, tombstones remained intact, no hard delete or duplicate data was observed, and dashboard/report values remained consistent. `11D.3` through `11D.5` remain open.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
