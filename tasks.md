@@ -559,7 +559,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11C.1 Validate wallet/category/transaction CRUD after sync
 - [x] 11C.2 Validate dashboard/report formulas remain unchanged
 - [x] 11C.3 Validate transfers after sync
-- [ ] 11C.4 Validate tombstones
+- [x] 11C.4 Validate tombstones
 - [ ] 11C.5 Validate app restart persistence
 - [ ] 11D.1 Validate offline create/edit/delete
 - [ ] 11D.2 Validate reconnect and `Sync Now`
@@ -592,6 +592,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11C Sync Settlement Bugfix Note**: Manual QA found a remote-existing Rp200.000 transfer transaction still had a local pending queue/entity status and `Sync Now` returned partial. The likely cause was strict equivalence causing `EQUAL_TIMESTAMP_MISMATCH` for semantically equivalent rows. Convergence equivalence now compares timestamp fields by parsed time and normalizes `undefined` to `null` for nullable fields without changing LWW rules. Retest is required before considering the pending queue issue resolved.
 
 **Phase 11C Sync Settlement Retest Status**: Retest after equivalence normalization patch passed. `Sync Now` completed, pending local queue became 0, Transfer Pending badge disappeared, Supabase remote row remained safe, and no duplicate remote row was created. Comprehensive tombstone QA and app restart persistence remain pending.
+
+**Phase 11C Tombstone QA Status**: `11C-TOMBSTONE-01` passed manually. Wallet/category/transaction tombstones were verified: deleted items are hidden from active UI, remote rows remain present, `deleted_at` is populated, no hard delete was observed, and tombstones remain preserved after `Sync Now`. App restart persistence remains pending.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
