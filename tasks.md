@@ -565,7 +565,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11D.2 Validate reconnect and `Sync Now`
 - [ ] 11D.3 Validate two-device convergence
 - [ ] 11D.4 Validate expired session behavior
-- [ ] 11D.5 Validate RLS isolation
+- [x] 11D.5 Validate RLS isolation
 - [ ] 11E.1 Remove obsolete documentation wording
 - [ ] 11E.2 Ensure no temporary DEV buttons/scripts remain
 - [ ] 11E.3 Ensure `.env.example` is safe
@@ -606,6 +606,10 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11D Two-Device QA Deferral**: `11D.3` two-device convergence is intentionally deferred due to test-device availability/time constraints. It remains unchecked and is not considered passed. Retest is required before claiming full multi-device release readiness. `11D.4` and `11D.5` remain open.
 
 **Phase 11D Expired Session QA Deferral**: `11D.4` expired-session behavior is intentionally deferred and remains unchecked. Normal logout prevents access to Settings and is not equivalent to expired-session `Sync Now` QA. Retest requires a safe way to invalidate the auth session while the app remains on a screen that can trigger `Sync Now`, or another approved QA strategy. `11D.5` remains open.
+
+**Phase 11D RLS QA Status**: `11D.5` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. User A only sees User A data, User B only sees User B data, remote rows have correct `user_id` ownership, no cross-user leak was observed, and `Sync Now` did not pull another user's rows.
+
+**Phase 11D Status**: `11D.1`, `11D.2`, and `11D.5` are complete. `11D.3` two-device convergence and `11D.4` expired-session behavior are deferred and not considered passed. Phase 11D is not claimed as fully passed because deferred items remain.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
