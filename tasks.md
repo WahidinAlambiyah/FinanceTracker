@@ -603,6 +603,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 
 **Phase 11D Reconnect QA Status**: `11D.2` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. Offline-created/edited/deleted data was preserved locally, `Sync Now` after reconnect cleared pending queue to 0, failed count remained 0, Supabase rows were created/updated correctly, tombstones remained intact, no hard delete or duplicate data was observed, and dashboard/report values remained consistent. `11D.3` through `11D.5` remain open.
 
+**Phase 11D Two-Device QA Deferral**: `11D.3` two-device convergence is intentionally deferred due to test-device availability/time constraints. It remains unchecked and is not considered passed. Retest is required before claiming full multi-device release readiness. `11D.4` and `11D.5` remain open.
+
 ### Legacy Phase 10 Checklist (Superseded)
 
 The checklist below was written for the former push-only Phase 10 scope. Do not use it for implementation tracking; use the approved 10A-10E checklist above. It is retained temporarily for requirements traceability until documentation cleanup is separately approved.
