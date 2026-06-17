@@ -32,15 +32,37 @@ function sameValue(left: unknown, right: unknown): boolean {
   return left === right;
 }
 
+function sameNullable(left: unknown, right: unknown): boolean {
+  return (left ?? null) === (right ?? null);
+}
+
+function sameTimestamp(left: string | null | undefined, right: string | null | undefined): boolean {
+  const normalizedLeft = left ?? null;
+  const normalizedRight = right ?? null;
+
+  if (normalizedLeft === null || normalizedRight === null) {
+    return normalizedLeft === normalizedRight;
+  }
+
+  const leftTime = Date.parse(normalizedLeft);
+  const rightTime = Date.parse(normalizedRight);
+
+  if (Number.isFinite(leftTime) && Number.isFinite(rightTime)) {
+    return leftTime === rightTime;
+  }
+
+  return normalizedLeft === normalizedRight;
+}
+
 function walletsEquivalent(local: Wallet, remote: Parameters<typeof remoteWalletRepository.upsertWallet>[0]): boolean {
   return sameValue(local.id, remote.id)
     && sameValue(local.user_id, remote.user_id)
     && sameValue(local.name, remote.name)
     && sameValue(local.type, remote.type)
     && sameValue(local.opening_balance, remote.opening_balance)
-    && sameValue(local.created_at, remote.created_at)
-    && sameValue(local.updated_at, remote.updated_at)
-    && sameValue(local.deleted_at, remote.deleted_at);
+    && sameTimestamp(local.created_at, remote.created_at)
+    && sameTimestamp(local.updated_at, remote.updated_at)
+    && sameTimestamp(local.deleted_at, remote.deleted_at);
 }
 
 function categoriesEquivalent(
@@ -51,12 +73,12 @@ function categoriesEquivalent(
     && sameValue(local.user_id, remote.user_id)
     && sameValue(local.name, remote.name)
     && sameValue(local.type, remote.type)
-    && sameValue(local.icon, remote.icon)
-    && sameValue(local.color, remote.color)
+    && sameNullable(local.icon, remote.icon)
+    && sameNullable(local.color, remote.color)
     && sameValue(local.is_default, remote.is_default)
-    && sameValue(local.created_at, remote.created_at)
-    && sameValue(local.updated_at, remote.updated_at)
-    && sameValue(local.deleted_at, remote.deleted_at);
+    && sameTimestamp(local.created_at, remote.created_at)
+    && sameTimestamp(local.updated_at, remote.updated_at)
+    && sameTimestamp(local.deleted_at, remote.deleted_at);
 }
 
 function transactionsEquivalent(
@@ -67,14 +89,14 @@ function transactionsEquivalent(
     && sameValue(local.user_id, remote.user_id)
     && sameValue(local.type, remote.type)
     && sameValue(local.wallet_id, remote.wallet_id)
-    && sameValue(local.destination_wallet_id, remote.destination_wallet_id)
-    && sameValue(local.category_id, remote.category_id)
+    && sameNullable(local.destination_wallet_id, remote.destination_wallet_id)
+    && sameNullable(local.category_id, remote.category_id)
     && sameValue(local.amount, remote.amount)
-    && sameValue(local.note, remote.note)
-    && sameValue(local.transaction_date, remote.transaction_date)
-    && sameValue(local.created_at, remote.created_at)
-    && sameValue(local.updated_at, remote.updated_at)
-    && sameValue(local.deleted_at, remote.deleted_at);
+    && sameNullable(local.note, remote.note)
+    && sameTimestamp(local.transaction_date, remote.transaction_date)
+    && sameTimestamp(local.created_at, remote.created_at)
+    && sameTimestamp(local.updated_at, remote.updated_at)
+    && sameTimestamp(local.deleted_at, remote.deleted_at);
 }
 
 async function ensureRemoteProfile(user: User): Promise<void> {

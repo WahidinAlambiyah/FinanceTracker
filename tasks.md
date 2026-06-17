@@ -557,7 +557,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11B.5 Review safe user-facing messages
 - [x] 11C.0 Create data integrity QA checklist and evidence template
 - [x] 11C.1 Validate wallet/category/transaction CRUD after sync
-- [ ] 11C.2 Validate dashboard/report formulas remain unchanged
+- [x] 11C.2 Validate dashboard/report formulas remain unchanged
 - [x] 11C.3 Validate transfers after sync
 - [ ] 11C.4 Validate tombstones
 - [ ] 11C.5 Validate app restart persistence
@@ -586,6 +586,10 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11C Bugfix Note**: `11C-TRANSFER-01` found a valid UI bug: Wallets screen displayed `opening_balance` instead of derived/current wallet balance after transfers. A small Wallets screen patch now reuses `getWalletBalances(userId)` from the dashboard feature and keeps the existing derived formula unchanged. `11C.3` remains open until transfer retest passes.
 
 **Phase 11C Transfer Retest Status**: `11C-TRANSFER-01` passed after the Wallets derived balance patch. Source wallet decreases, destination wallet increases, transfer does not count as income/expense, and the existing balance formula remains unchanged. Dashboard/report formula QA, comprehensive tombstone QA, app restart persistence, and user isolation remain pending.
+
+**Phase 11C Formula QA Status**: `11C-FORMULA-01` passed manually. Verified Income Rp900.000, Expense Rp525.000, Net Cashflow Rp375.000, and Total Balance Rp10.500.000 from Dana Rp800.000 plus Bank BCA Rp9.700.000. Transfers do not count as income/expense.
+
+**Phase 11C Sync Settlement Bugfix Note**: Manual QA found a remote-existing Rp200.000 transfer transaction still had a local pending queue/entity status and `Sync Now` returned partial. The likely cause was strict equivalence causing `EQUAL_TIMESTAMP_MISMATCH` for semantically equivalent rows. Convergence equivalence now compares timestamp fields by parsed time and normalizes `undefined` to `null` for nullable fields without changing LWW rules. Retest is required before considering the pending queue issue resolved.
 
 ### Legacy Phase 10 Checklist (Superseded)
 

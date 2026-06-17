@@ -422,7 +422,7 @@ Steps:
 | 11C-TRX-02 | Expense transaction sync | PASS | Expense transaction sync path validated. |
 | 11C-TRX-03 | Transaction edit and soft delete | PASS | Transaction edit and soft-delete sync path validated. |
 | 11C-TRANSFER-01 | Transfer integrity after sync | PASS | Retest passed after Wallets screen derived balance patch. Source wallet decreases, destination wallet increases, transfer does not count as income/expense, and the existing balance formula remains unchanged. |
-| 11C-FORMULA-01 | Dashboard and report formula integrity | SKIP | Intentionally deferred; remains pending. |
+| 11C-FORMULA-01 | Dashboard and report formula integrity | PASS | Manual QA passed: Income Rp900.000, Expense Rp525.000, Net Cashflow Rp375.000, Dana Rp800.000 + Bank BCA Rp9.700.000 = Total Balance Rp10.500.000. Transfers do not count as income/expense. |
 | 11C-TOMBSTONE-01 | Tombstone integrity | SKIP | Comprehensive tombstone check intentionally deferred; remains pending. |
 | 11C-PERSIST-01 | App restart persistence | SKIP | Intentionally deferred; remains pending. |
 | 11C-ISO-01 | User isolation | SKIP | Intentionally deferred; remains pending. |
@@ -433,6 +433,26 @@ Pending Phase 11C items:
 - Comprehensive tombstone integrity.
 - App restart persistence.
 - User isolation.
+
+### Phase 11C Sync Queue Settlement Finding
+
+Manual QA found that the Rp200.000 transfer transaction existed in Supabase, but the local app still showed the transaction as pending:
+
+- Settings showed `Pending local queue: 1 item`.
+- Settings showed `Failed: 0 items`.
+- `Sync Now` returned `Some items still need attention`.
+- The transfer row existed remotely, so the remote write had succeeded.
+
+Most likely root cause: strict equivalence comparison caused `EQUAL_TIMESTAMP_MISMATCH` for a semantically equivalent local/remote transaction row. In that path, convergence intentionally did not call `transactionRepository.markSyncedIfUnchanged(...)` or `queueRepository.markSuccess(...)`, leaving the queue row and transaction status pending.
+
+Patch applied: convergence equivalence now compares timestamp fields by parsed time and normalizes `undefined` to `null` for nullable fields without treating empty string as null. LWW ordering rules are unchanged.
+
+Retest required:
+
+- Run `Sync Now`.
+- Pending local queue should become `0`.
+- Transfer pending badge should disappear.
+- No duplicate remote row should be created.
 
 ## Supabase SQL Helper Queries
 
