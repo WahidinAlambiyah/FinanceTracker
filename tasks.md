@@ -591,6 +591,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 
 **Phase 11C Sync Settlement Bugfix Note**: Manual QA found a remote-existing Rp200.000 transfer transaction still had a local pending queue/entity status and `Sync Now` returned partial. The likely cause was strict equivalence causing `EQUAL_TIMESTAMP_MISMATCH` for semantically equivalent rows. Convergence equivalence now compares timestamp fields by parsed time and normalizes `undefined` to `null` for nullable fields without changing LWW rules. Retest is required before considering the pending queue issue resolved.
 
+**Phase 11C Sync Settlement Retest Status**: Retest after equivalence normalization patch passed. `Sync Now` completed, pending local queue became 0, Transfer Pending badge disappeared, Supabase remote row remained safe, and no duplicate remote row was created. Comprehensive tombstone QA and app restart persistence remain pending.
+
 ### Legacy Phase 10 Checklist (Superseded)
 
 The checklist below was written for the former push-only Phase 10 scope. Do not use it for implementation tracking; use the approved 10A-10E checklist above. It is retained temporarily for requirements traceability until documentation cleanup is separately approved.

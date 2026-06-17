@@ -454,6 +454,14 @@ Retest required:
 - Transfer pending badge should disappear.
 - No duplicate remote row should be created.
 
+Retest result after equivalence normalization patch: PASS.
+
+- Run `Sync Now`: PASS.
+- Pending local queue became `0`: PASS.
+- Transfer Pending badge disappeared: PASS.
+- Supabase remote row remained safe: PASS.
+- No duplicate remote row was created: PASS.
+
 ## Supabase SQL Helper Queries
 
 Use these as read-only verification helpers in Supabase SQL editor. Replace placeholders before running.
