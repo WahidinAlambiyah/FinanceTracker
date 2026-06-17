@@ -424,13 +424,12 @@ Steps:
 | 11C-TRANSFER-01 | Transfer integrity after sync | PASS | Retest passed after Wallets screen derived balance patch. Source wallet decreases, destination wallet increases, transfer does not count as income/expense, and the existing balance formula remains unchanged. |
 | 11C-FORMULA-01 | Dashboard and report formula integrity | PASS | Manual QA passed: Income Rp900.000, Expense Rp525.000, Net Cashflow Rp375.000, Dana Rp800.000 + Bank BCA Rp9.700.000 = Total Balance Rp10.500.000. Transfers do not count as income/expense. |
 | 11C-TOMBSTONE-01 | Tombstone integrity | PASS | Wallet/category/transaction tombstones verified. Deleted items are hidden from active UI, remote rows remain present, `deleted_at` is populated, no hard delete was observed, and tombstones remain preserved after `Sync Now`. |
-| 11C-PERSIST-01 | App restart persistence | SKIP | Intentionally deferred; remains pending. |
+| 11C-PERSIST-01 | App restart persistence | PASS | Full app close/reopen verified. Wallet, transaction, dashboard, and reports data persisted correctly; tombstoned items remained hidden from active UI; Settings showed no new pending/failed queue after restart; `Sync Now` after restart did not create duplicate data. |
 | 11C-ISO-01 | User isolation | SKIP | Intentionally deferred; remains pending. |
 
 Pending Phase 11C items:
 
 - Dashboard/report formula integrity.
-- App restart persistence.
 - User isolation.
 
 ### Phase 11C Sync Queue Settlement Finding

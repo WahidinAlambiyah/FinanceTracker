@@ -560,7 +560,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11C.2 Validate dashboard/report formulas remain unchanged
 - [x] 11C.3 Validate transfers after sync
 - [x] 11C.4 Validate tombstones
-- [ ] 11C.5 Validate app restart persistence
+- [x] 11C.5 Validate app restart persistence
 - [ ] 11D.1 Validate offline create/edit/delete
 - [ ] 11D.2 Validate reconnect and `Sync Now`
 - [ ] 11D.3 Validate two-device convergence
@@ -594,6 +594,10 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11C Sync Settlement Retest Status**: Retest after equivalence normalization patch passed. `Sync Now` completed, pending local queue became 0, Transfer Pending badge disappeared, Supabase remote row remained safe, and no duplicate remote row was created. Comprehensive tombstone QA and app restart persistence remain pending.
 
 **Phase 11C Tombstone QA Status**: `11C-TOMBSTONE-01` passed manually. Wallet/category/transaction tombstones were verified: deleted items are hidden from active UI, remote rows remain present, `deleted_at` is populated, no hard delete was observed, and tombstones remain preserved after `Sync Now`. App restart persistence remains pending.
+
+**Phase 11C App Restart Persistence QA Status**: `11C-PERSIST-01` passed manually. Full app close/reopen preserved wallet data, transaction data, dashboard values, and reports values. Tombstoned items remained hidden from active UI, Settings showed no new pending/failed queue after restart, and `Sync Now` after restart did not create duplicate data.
+
+**Phase 11C Status**: Phase 11C data integrity QA items `11C.1` through `11C.5` are complete. RLS/user isolation remains tracked under Phase 11D and is not marked complete here.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
