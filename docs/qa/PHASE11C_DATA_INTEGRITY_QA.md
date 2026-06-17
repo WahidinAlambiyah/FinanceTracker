@@ -1,6 +1,6 @@
 # Phase 11C Data Integrity QA
 
-**Status**: Checklist prepared; manual execution pending  
+**Status**: Manual QA completed for Phase 11C data integrity items  
 **Scope**: Manual QA for data integrity after Phase 10 sync  
 **Runtime changes**: None
 
@@ -408,8 +408,8 @@ Steps:
 
 ## Manual Execution Result
 
-**Execution status**: Partial manual QA executed.  
-**Result summary**: Wallet, category, and transaction CRUD after sync passed. Transfer integrity, dashboard/report formula integrity, comprehensive tombstone verification, app restart persistence, and user isolation were intentionally skipped and remain pending.
+**Execution status**: Phase 11C data integrity QA completed for 11C.1 through 11C.5.  
+**Result summary**: Wallet, category, transaction, transfer, dashboard/report formula, tombstone, and app restart persistence checks passed. User isolation was not completed under Phase 11C because it is tracked under Phase 11D; Phase 11D.5 later passed manual RLS isolation QA.
 
 | Test ID | Area | Status | Notes |
 |---|---|---|---|
@@ -425,12 +425,12 @@ Steps:
 | 11C-FORMULA-01 | Dashboard and report formula integrity | PASS | Manual QA passed: Income Rp900.000, Expense Rp525.000, Net Cashflow Rp375.000, Dana Rp800.000 + Bank BCA Rp9.700.000 = Total Balance Rp10.500.000. Transfers do not count as income/expense. |
 | 11C-TOMBSTONE-01 | Tombstone integrity | PASS | Wallet/category/transaction tombstones verified. Deleted items are hidden from active UI, remote rows remain present, `deleted_at` is populated, no hard delete was observed, and tombstones remain preserved after `Sync Now`. |
 | 11C-PERSIST-01 | App restart persistence | PASS | Full app close/reopen verified. Wallet, transaction, dashboard, and reports data persisted correctly; tombstoned items remained hidden from active UI; Settings showed no new pending/failed queue after restart; `Sync Now` after restart did not create duplicate data. |
-| 11C-ISO-01 | User isolation | SKIP | Intentionally deferred; remains pending. |
+| 11C-ISO-01 | User isolation | SKIP | Not completed under Phase 11C; user isolation is tracked under Phase 11D and later passed as 11D.5. |
 
 Pending Phase 11C items:
 
-- Dashboard/report formula integrity.
-- User isolation.
+- None for 11C.1 through 11C.5.
+- User isolation remains tracked under Phase 11D and is not marked as a Phase 11C completion item.
 
 ### Phase 11C Sync Queue Settlement Finding
 

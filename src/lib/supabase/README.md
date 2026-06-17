@@ -18,6 +18,12 @@ This directory contains the Supabase client configuration and secure session sto
 
 ## Setup
 
+## Current Remote Data Status
+
+The Phase 9 Supabase schema/RLS work and Phase 10 manual sync MVP have been implemented. Supabase is now used for Auth and as remote persistence for manual Settings `Sync Now`; local SQLite remains the runtime source of truth for financial UI and business calculations.
+
+The notes below retain setup and historical Phase 9 guidance. Do not read them as saying remote schema/RLS or manual sync are still future-only.
+
 ### 1. Environment Configuration
 
 Create a `.env` file in the project root (copy from `.env.example`):
@@ -43,8 +49,8 @@ Supabase Auth remains managed in the default `auth` schema.
 Phase 9B SQL draft:
 
 - `docs/sql/phase9b_financetracker_schema_rls.sql`
-- Draft only; it has not been executed in Supabase.
-- Review manually before applying.
+- Historical draft used for Phase 9 schema/RLS setup.
+- Review the current Supabase project state before reapplying or changing it.
 
 Planned application tables:
 
@@ -64,10 +70,10 @@ ALTER TABLE financetracker.transactions ENABLE ROW LEVEL SECURITY;
 
 Policies must ensure users can only select, insert, update, or delete their own rows. For inserts and updates, use `WITH CHECK (auth.uid() = user_id)` on user-owned tables.
 
-Important Phase 9 boundary:
+Historical Phase 9 boundary:
 
 - Do not push or pull financial data during schema/RLS setup.
-- Do not process `sync_queue` until Phase 10.
+- Do not process `sync_queue` until the approved Phase 10 sync services are in scope.
 - Keep runtime reads and writes SQLite-first.
 
 ## Security

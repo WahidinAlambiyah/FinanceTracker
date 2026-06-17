@@ -1,8 +1,10 @@
 # Phase 11 Hardening and Release Readiness Plan
 
-**Status**: Phase 11A planning and Phase 10 closure documentation only  
+**Status**: Phase 11E release-readiness cleanup in progress  
 **Scope**: Post-MVP sync hardening, QA, and release readiness  
 **Architecture**: SQLite remains the runtime source of truth; Supabase remains remote persistence for authenticated backup and multi-device sync
+
+**Current QA caveat**: Phase 11D.1, 11D.2, and 11D.5 have passed manual QA. Phase 11D.3 two-device convergence and 11D.4 expired-session behavior are deferred and not considered passed.
 
 ## Executive Summary
 

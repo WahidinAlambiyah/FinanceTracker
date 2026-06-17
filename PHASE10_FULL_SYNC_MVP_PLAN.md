@@ -1,16 +1,18 @@
 # Phase 10 Full Sync MVP Plan
 
-**Status**: Phase 10A-10D verified; Phase 10E implemented and awaiting manual verification  
+**Status**: Phase 10 Full Sync MVP verified and closed  
 **Scope**: Full MVP sync across Phase 10A-10E  
 **Architecture**: SQLite remains the runtime source of truth; Supabase is remote persistence only
 
-**Phase 10A Status**: Remote repository layer implemented. Push/pull orchestration, conflict handling, and sync UI have not started.
+> Note: Some per-subphase status notes below are historical snapshots from implementation time. The current authoritative status is that Phase 10 is closed; Phase 11E cleanup is in progress, with Phase 11D.3 and 11D.4 deferred.
 
-**Phase 10B Status**: Explicit push sync service implemented. It is not wired to UI or automatic triggers. Pull sync, conflict handling, and full-cycle cursor advancement have not started.
+**Phase 10A Status**: Remote repository layer implemented and later verified as part of the closed Phase 10 MVP.
 
-**Phase 10C Status**: Explicit pull sync service implemented. It skips rows with unsynced local queue work and returns the maximum observed remote timestamp without advancing `last_sync_at`. Conflict resolution and UI/automatic triggers have not started.
+**Phase 10B Status**: Explicit push sync service implemented and later verified as part of the closed Phase 10 MVP.
 
-**Phase 10D Status**: Explicit LWW convergence service implemented. It performs conflict-aware queue processing before pull, settles deterministic local/remote/equivalent outcomes, preserves equal-timestamp mismatches as unresolved, and never hard deletes. It does not advance `last_sync_at` and is not wired to UI or automatic triggers.
+**Phase 10C Status**: Explicit pull sync service implemented and later verified as part of the closed Phase 10 MVP.
+
+**Phase 10D Status**: Explicit LWW convergence service implemented and later verified as part of the closed Phase 10 MVP.
 
 **Phase 10E Status**: Production manual sync UI is implemented in Settings using the convergence service. It includes current-user device-local counts, safe result states, manual retry, guarded concurrency, and per-user successful-sync metadata. No background, app-start, foreground, or connectivity-triggered sync was added.
 
