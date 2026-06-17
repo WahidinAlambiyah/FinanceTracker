@@ -570,8 +570,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11D.5 Validate RLS isolation
 - [x] 11E.1 Remove obsolete documentation wording
 - [x] 11E.2 Ensure no temporary DEV buttons/scripts remain
-- [ ] 11E.3 Ensure `.env.example` is safe
-- [ ] 11E.4 Ensure no secrets or local test files are committed
+- [x] 11E.3 Ensure `.env.example` is safe
+- [x] 11E.4 Ensure no secrets or local test files are committed
 - [ ] 11E.5 Document lint/typecheck checklist
 - [ ] 11E.6 Prepare demo script
 
@@ -614,6 +614,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 **Phase 11D Status**: `11D.1`, `11D.2`, and `11D.5` are complete. `11D.3` two-device convergence and `11D.4` expired-session behavior are deferred and not considered passed. Phase 11D is not claimed as fully passed because deferred items remain.
 
 **Phase 11E.1-11E.2 Cleanup Status**: Obsolete documentation wording was updated to reflect current Phase 10/11 status. Review found no temporary DEV sync buttons, reset/wipe scripts, or production-reachable debug sync UI. Production `Sync Now` remains the approved Phase 10E manual sync action. Logging policy cleanup remains an owner decision and is not treated as a completed runtime change.
+
+**Phase 11E.3-11E.4 Cleanup Status**: `.env.example` was verified as placeholder-only. Git safety checks confirmed `.env` is local-only and not present in git history; `.expo/` is ignored; `.claude/settings.json` is tracked and remains an owner decision. `.gitignore` was hardened for env variants, local SQLite files, keystore/certificate files, and credential artifacts. No runtime behavior changed.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
