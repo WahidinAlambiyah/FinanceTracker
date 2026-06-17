@@ -572,7 +572,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11E.2 Ensure no temporary DEV buttons/scripts remain
 - [x] 11E.3 Ensure `.env.example` is safe
 - [x] 11E.4 Ensure no secrets or local test files are committed
-- [ ] 11E.5 Document lint/typecheck checklist
+- [x] 11E.5 Document lint/typecheck checklist
 - [ ] 11E.6 Prepare demo script
 
 **Phase 11A Status**: Planning and Phase 10 closure documentation completed only. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed.
@@ -617,7 +617,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 
 **Phase 11E.3-11E.4 Cleanup Status**: `.env.example` was verified as placeholder-only. Git safety checks confirmed `.env` is local-only and not present in git history; `.expo/` is ignored; `.claude/settings.json` is tracked and remains an owner decision. `.gitignore` was hardened for env variants, local SQLite files, keystore/certificate files, and credential artifacts. No runtime behavior changed.
 
-**Phase 11E.5A Static Check Status**: Added `npm run typecheck` as `tsc --noEmit` and ran it successfully. Typecheck result: PASS. Lint result: NOT AVAILABLE because no project-level ESLint config or lint dependency is present, and no new lint tooling was added in this task. `11E.5` remains partial/open pending owner decision on lint setup. No runtime, schema, sync, Supabase config, or logging behavior changed. `11E.6` remains open.
+**Phase 11E.5 Static Check Status**: `npm run typecheck` exists and runs `tsc --noEmit`. Typecheck result from 11E.5A: PASS. Lint result: NOT AVAILABLE because no project-level ESLint config or lint dependency is present. Owner decision: do not add ESLint/lint tooling in Phase 11E; lint setup is deferred to a future owner-approved task. `11E.5` is complete with this documented limitation. No runtime, schema, sync, Supabase config, or logging behavior changed. `11E.6` remains open.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
