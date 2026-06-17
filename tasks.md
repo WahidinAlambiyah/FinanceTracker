@@ -617,6 +617,8 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 
 **Phase 11E.3-11E.4 Cleanup Status**: `.env.example` was verified as placeholder-only. Git safety checks confirmed `.env` is local-only and not present in git history; `.expo/` is ignored; `.claude/settings.json` is tracked and remains an owner decision. `.gitignore` was hardened for env variants, local SQLite files, keystore/certificate files, and credential artifacts. No runtime behavior changed.
 
+**Phase 11E.5A Static Check Status**: Added `npm run typecheck` as `tsc --noEmit` and ran it successfully. Typecheck result: PASS. Lint result: NOT AVAILABLE because no project-level ESLint config or lint dependency is present, and no new lint tooling was added in this task. `11E.5` remains partial/open pending owner decision on lint setup. No runtime, schema, sync, Supabase config, or logging behavior changed. `11E.6` remains open.
+
 ### Legacy Phase 10 Checklist (Superseded)
 
 The checklist below was written for the former push-only Phase 10 scope. Do not use it for implementation tracking; use the approved 10A-10E checklist above. It is retained temporarily for requirements traceability until documentation cleanup is separately approved.
