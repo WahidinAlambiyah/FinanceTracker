@@ -67,14 +67,14 @@ export default function CategoriesScreen() {
       if (!seedResult.success) {
         Alert.alert(
           'Warning',
-          'Failed to load default categories. You can still create custom categories.'
+          'Default categories could not be prepared. You can still create custom categories.'
         );
       }
     } catch (error) {
       logger.error('Seeding check failed', error);
       Alert.alert(
         'Warning',
-        'Failed to load default categories. You can still create custom categories.'
+        'Default categories could not be prepared. You can still create custom categories.'
       );
     } finally {
       setIsSeeding(false);
@@ -93,10 +93,10 @@ export default function CategoriesScreen() {
       if (result.success && result.data) {
         setCategories(result.data);
       } else {
-        Alert.alert('Error', result.error || 'Failed to load categories');
+        Alert.alert('Could not load categories', 'Please pull to refresh or try another category type.');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load categories');
+      Alert.alert('Could not load categories', 'Please pull to refresh or try another category type.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -288,14 +288,20 @@ export default function CategoriesScreen() {
           )}
           <View style={styles.categoryInfo}>
             <View style={styles.categoryHeader}>
-              <Text style={styles.categoryName}>{item.name}</Text>
+              <Text style={styles.categoryName} numberOfLines={1} ellipsizeMode="tail">
+                {item.name}
+              </Text>
               {item.is_default && (
                 <View style={styles.defaultBadge}>
                   <Text style={styles.defaultBadgeText}>Default</Text>
                 </View>
               )}
             </View>
-            {item.icon && <Text style={styles.categoryIcon}>{item.icon}</Text>}
+            {item.icon && (
+              <Text style={styles.categoryIcon} numberOfLines={1} ellipsizeMode="tail">
+                {item.icon}
+              </Text>
+            )}
           </View>
         </View>
         {item.sync_status === 'pending' && (
@@ -318,10 +324,10 @@ export default function CategoriesScreen() {
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Text style={styles.emptyStateTitle}>
-        No {selectedType} categories yet
+        No categories yet
       </Text>
       <Text style={styles.emptyStateText}>
-        Add your first custom {selectedType} category
+        Create categories to organize your income and expenses.
       </Text>
       <TouchableOpacity style={styles.emptyStateButton} onPress={handleAddCategory}>
         <Text style={styles.emptyStateButtonText}>Add Category</Text>
@@ -453,7 +459,7 @@ export default function CategoriesScreen() {
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#2563EB" />
         <Text style={styles.loadingText}>
-          {isSeeding ? 'Loading default categories...' : 'Loading categories...'}
+          {isSeeding ? 'Preparing default categories...' : 'Loading categories...'}
         </Text>
       </View>
     );
@@ -550,6 +556,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0,
   },
   colorCircle: {
     width: 32,
@@ -559,27 +566,32 @@ const styles = StyleSheet.create({
   },
   categoryInfo: {
     flex: 1,
+    minWidth: 0,
   },
   categoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
+    minWidth: 0,
   },
   categoryName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#0F172A',
     marginRight: 8,
+    flexShrink: 1,
   },
   categoryIcon: {
     fontSize: 12,
     color: '#64748B',
+    flexShrink: 1,
   },
   defaultBadge: {
     backgroundColor: '#EFF6FF',
     borderRadius: 4,
     paddingHorizontal: 6,
     paddingVertical: 2,
+    flexShrink: 0,
   },
   defaultBadgeText: {
     fontSize: 11,
@@ -590,6 +602,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 6,
     paddingVertical: 2,
+    marginLeft: 8,
+    flexShrink: 0,
   },
   syncBadgeText: {
     fontSize: 11,

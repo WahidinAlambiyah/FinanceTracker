@@ -67,10 +67,10 @@ export default function DashboardScreen() {
       if (result.success && result.data) {
         setDashboard(result.data);
       } else {
-        Alert.alert('Error', result.error || 'Failed to load dashboard');
+        Alert.alert('Could not load dashboard', 'Please pull to refresh or reopen the app.');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load dashboard');
+      Alert.alert('Could not load dashboard', 'Please pull to refresh or reopen the app.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -206,7 +206,7 @@ export default function DashboardScreen() {
           <View style={styles.transactionLeft}>
             <Text style={[styles.typeIcon, { color: typeColor }]}>{typeIcon}</Text>
             <View style={styles.transactionInfo}>
-              <Text style={styles.transactionLabel} numberOfLines={1}>
+              <Text style={styles.transactionLabel} numberOfLines={1} ellipsizeMode="tail">
                 {displayLabel}
               </Text>
               <Text style={styles.transactionDate}>
@@ -215,7 +215,11 @@ export default function DashboardScreen() {
             </View>
           </View>
 
-          <Text style={[styles.transactionAmount, { color: typeColor }]}>
+          <Text
+            style={[styles.transactionAmount, { color: typeColor }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {formatRupiah(transaction.amount)}
           </Text>
         </View>
@@ -232,9 +236,9 @@ export default function DashboardScreen() {
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Recent Transactions</Text>
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No transactions yet</Text>
+          <Text style={styles.emptyStateText}>No recent activity yet</Text>
             <Text style={styles.emptyStateHint}>
-              Add your first transaction to start tracking
+              Add income, expense, or transfer records to see them here.
             </Text>
           </View>
         </View>
@@ -259,9 +263,9 @@ export default function DashboardScreen() {
    */
   const renderEmptyState = () => (
     <View style={styles.centered}>
-      <Text style={styles.emptyStateTitle}>Get Started</Text>
+      <Text style={styles.emptyStateTitle}>No activity yet</Text>
       <Text style={styles.emptyStateText}>
-        Add your first transaction to see your financial overview
+        Add your first transaction to see your income, expenses, and balance summary here.
       </Text>
       <TouchableOpacity
         style={styles.emptyStateButton}
@@ -276,7 +280,7 @@ export default function DashboardScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#2563EB" />
-        <Text style={styles.loadingText}>Loading dashboard...</Text>
+        <Text style={styles.loadingText}>Loading your dashboard...</Text>
       </View>
     );
   }
@@ -480,6 +484,7 @@ const styles = StyleSheet.create({
   },
   transactionInfo: {
     flex: 1,
+    minWidth: 0,
   },
   transactionLabel: {
     fontSize: 14,
@@ -494,6 +499,8 @@ const styles = StyleSheet.create({
   transactionAmount: {
     fontSize: 14,
     fontWeight: '600',
+    marginLeft: 12,
+    flexShrink: 0,
   },
   emptyState: {
     paddingVertical: 20,
