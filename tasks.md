@@ -709,7 +709,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 - [ ] 12D Form validation and confirmation polish
 - [ ] 12E Final polish verification
 
-**Phase 12B Status**: User-facing Settings and sync copy was polished only. Raw user ID is hidden from normal Settings UI, technical queue wording was replaced with clearer user-facing labels, manual `Sync Now` behavior is explained, and internal roadmap/phase wording is not shown to users. No sync behavior, SQLite schema, Supabase config/RLS, dependencies, or runtime data flow changed. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
+**Phase 12B Status**: User-facing Settings and sync copy was polished only. Raw user ID is hidden from normal Settings UI, technical queue wording was replaced with clearer user-facing labels, manual `Sync Now` behavior is explained, and internal roadmap/phase wording is not shown to users. Validation follow-up passed with `npm.cmd run typecheck`. No sync behavior, SQLite schema, Supabase config/RLS, dependencies, or runtime data flow changed. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 <!-- Legacy Phase 12 checklist retained below for requirements traceability. -->
 
