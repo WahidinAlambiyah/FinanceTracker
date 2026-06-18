@@ -137,7 +137,7 @@ export default function SettingsScreen() {
       setSyncMessage(result.message);
       Alert.alert('Sync Status', result.message);
     } catch {
-      const message = 'Sync could not be completed. Please try again.';
+      const message = 'Sync could not be completed. Your local data is saved. Please try again.';
       logger.warn('Manual sync UI failed', { code: 'MANUAL_SYNC_FAILED' });
       setSyncOutcome('failed');
       setSyncMessage(message);
@@ -160,13 +160,6 @@ export default function SettingsScreen() {
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Email</Text>
               <Text style={styles.infoValue}>{user?.email}</Text>
-            </View>
-            
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>User ID</Text>
-              <Text style={styles.infoValue} numberOfLines={1}>
-                {user?.id}
-              </Text>
             </View>
           </View>
         </View>
@@ -207,7 +200,7 @@ export default function SettingsScreen() {
 
                 {/* Pending Items */}
                 <View style={styles.syncRow}>
-                  <Text style={styles.syncLabel}>Pending local queue</Text>
+                  <Text style={styles.syncLabel}>Waiting to sync</Text>
                   <Text style={styles.syncValue}>
                     {syncStatus.pendingCount}{' '}
                     {syncStatus.pendingCount === 1 ? 'item' : 'items'}
@@ -218,7 +211,7 @@ export default function SettingsScreen() {
 
                 {/* Failed Items */}
                 <View style={styles.syncRow}>
-                  <Text style={styles.syncLabel}>Failed</Text>
+                  <Text style={styles.syncLabel}>Needs retry</Text>
                   <Text
                     style={[
                       styles.syncValue,
@@ -231,8 +224,17 @@ export default function SettingsScreen() {
                 </View>
 
                 <Text style={styles.syncHint}>
-                  Queue counts are device-local for this account.
+                  These changes are saved on this device.
                 </Text>
+
+                <View style={styles.syncInfo}>
+                  <Text style={styles.syncInfoText}>
+                    Sync runs only when you tap Sync Now.
+                  </Text>
+                  <Text style={styles.syncInfoText}>
+                    You can keep using the app offline; changes are saved on this device.
+                  </Text>
+                </View>
 
                 {(isSyncing || syncMessage) && (
                   <View
@@ -288,12 +290,6 @@ export default function SettingsScreen() {
               <Text style={styles.settingChevron}>›</Text>
             </TouchableOpacity>
 
-            <View style={styles.separator} />
-
-            {/* Future Settings Placeholder */}
-            <Text style={styles.placeholderText}>
-              Additional settings coming in Phase 12:
-            </Text>
             <Text style={styles.placeholderItem}>• Export data (CSV)</Text>
             <Text style={styles.placeholderItem}>• App lock (PIN/biometric)</Text>
           </View>
@@ -392,6 +388,18 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 12,
   },
+  syncInfo: {
+    marginTop: 16,
+    borderRadius: 8,
+    backgroundColor: '#EFF6FF',
+    padding: 12,
+    gap: 6,
+  },
+  syncInfoText: {
+    fontSize: 13,
+    color: '#1E40AF',
+    lineHeight: 18,
+  },
   syncResult: {
     marginTop: 16,
     borderRadius: 8,
@@ -466,6 +474,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   placeholderItem: {
+    display: 'none',
     fontSize: 14,
     color: '#0F172A',
     marginBottom: 6,

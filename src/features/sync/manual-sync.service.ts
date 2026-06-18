@@ -51,15 +51,15 @@ function isCompleteSuccess(result: NonNullable<ManualSyncResult['convergenceResu
 function messageFor(outcome: ManualSyncOutcome): string {
   switch (outcome) {
     case 'success':
-      return 'Sync completed';
+      return 'Sync completed. Your latest changes are backed up.';
     case 'partial':
-      return 'Some items still need attention';
+      return 'Some changes still need to sync. Your local data is saved; try Sync Now again.';
     case 'offline':
-      return "You're offline";
+      return "You're offline. Your local changes are saved. Reconnect, then tap Sync Now.";
     case 'auth_required':
-      return 'Please sign in again';
+      return 'Please sign in again to sync your changes.';
     default:
-      return 'Sync could not be completed. Please try again.';
+      return 'Sync could not be completed. Your local data is saved. Please try again.';
   }
 }
 
