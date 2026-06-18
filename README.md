@@ -4,6 +4,14 @@ An offline-first mobile financial tracking application built with Expo React Nat
 
 ## Project Status
 
+**Current phase**: Phase 11E Release Readiness Cleanup.
+
+Phase 10 Full Sync MVP is closed. The app now includes local SQLite runtime data, Supabase Auth, the `financetracker` remote schema/RLS boundary, remote repositories, and manual Settings `Sync Now` through push, pull, and convergence services.
+
+Release-readiness caveat: Phase 11D.3 two-device convergence and 11D.4 expired-session behavior are deferred and not considered passed.
+
+Historical setup snapshot:
+
 ✅ **Phase 0 Complete** - Project Setup
 - Expo React Native with TypeScript configured
 - Expo Router installed and configured
@@ -136,11 +144,18 @@ This project follows a spec-driven development approach:
 
 ## Next Steps
 
+Current active next steps:
+
+- [ ] Phase 11D.3 two-device convergence retest
+- [ ] Phase 11D.4 expired-session behavior retest
+- [ ] Phase 11E release-readiness cleanup
+
+Historical setup sequence:
+
 - [x] Phase 0: Project Setup
 - [x] Phase 1: Local Database Foundation
 - [x] Phase 2: Core Utilities
-- [ ] Phase 3: Authentication
-- [ ] Phase 4+: Feature implementation
+- [x] Phase 3+: Authentication and core feature implementation
 
 See `tasks.md` for detailed implementation tasks.
 

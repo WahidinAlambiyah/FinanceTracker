@@ -103,6 +103,7 @@ export class ManualSyncService {
       };
     }
 
+    const syncCycleStartedAt = getCurrentTimestamp();
     const result = await convergenceSyncService.converge({
       updatedAfter: getOverlappedUpdatedAfter(currentStatus.lastSyncAt),
       maxRetries: MANUAL_RETRY_LIMIT,
@@ -124,7 +125,7 @@ export class ManualSyncService {
       const db = await getDatabase();
       await getSyncMetadataRepository(db).set(
         getLastSyncAtKey(userId),
-        getCurrentTimestamp()
+        syncCycleStartedAt
       );
     } else {
       logger.warn('Manual sync incomplete', {

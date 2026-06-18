@@ -446,23 +446,25 @@
   - Unit tests for sync metadata repository
   - UI tests for sync status badge
 
-**Phase 8 Status**: Implementation complete. Network detection using @react-native-community/netinfo. Sync queue repository expanded with query/update methods. Sync metadata repository implemented. Sync status badge component created. Dashboard shows network status. Settings displays sync status (network state, pending/failed counts, last sync placeholder). All sync data remains local SQLite only. No remote sync processing implemented. No Supabase schema/RLS/write/read implemented. Phase 9 and Phase 10 have not started.
+**Phase 8 Historical Status**: Implementation complete. Network detection using @react-native-community/netinfo. Sync queue repository expanded with query/update methods. Sync metadata repository implemented. Sync status badge component created. Dashboard shows network status. Settings displayed sync status foundation. At Phase 8 closure, remote sync processing and Supabase schema/RLS were not yet implemented; later Phase 9 and Phase 10 work completed those approved scopes.
 
 ---
 
 ## Phase 9 — Supabase Remote Schema and RLS
 
-**Phase 9A Planning Status**: Documentation-only plan created in `PHASE9_PLAN.md`. No Supabase schema, RLS policies, SQL migrations, remote repositories, sync queue processing, or runtime app behavior changes have been implemented yet.
+**Current status note**: Phase 9 is historical and was followed by Phase 10 Full Sync MVP. Supabase is now remote persistence for manual sync; SQLite remains the runtime source of truth.
+
+**Phase 9A Planning Status**: Documentation-only plan created in `PHASE9_PLAN.md`. This was the initial planning status before later Phase 9/10 implementation work.
 
 - [x] 9.0 Prepare Phase 9B SQL draft only
   - Draft file: `docs/sql/phase9b_financetracker_schema_rls.sql`.
-  - SQL has not been executed in Supabase.
-  - Schema/RLS implementation remains awaiting review and manual execution approval.
+  - Historical note: SQL was not executed as part of this draft-only task.
+  - Later schema/RLS status is tracked by Phase 9C/Phase 10/Phase 11 QA notes.
 
 - [x] 9.0.1 Prepare Phase 9C manual apply and RLS test guide
   - Guide file: `docs/sql/PHASE9C_MANUAL_APPLY_AND_RLS_TEST.md`.
-  - Documentation only; no SQL was executed.
-  - Phase 9C manual application and testing remain pending.
+  - Historical note: this item prepared the guide only.
+  - Later RLS verification status is tracked under Phase 11D.5.
 
 - [ ] 9.1 Create Supabase SQL migration
   - profiles table.
@@ -492,7 +494,7 @@
 
 - [x] 10.0 Prepare Full Sync MVP implementation plan
   - Plan file: `PHASE10_FULL_SYNC_MVP_PLAN.md`.
-  - Documentation only; Phase 10 implementation has not started.
+  - Historical planning item; Phase 10 implementation is now complete and closed.
 
 ### Phase 10A — Remote Repositories
 
@@ -502,7 +504,7 @@
 - [x] 10A.4 Create remote category repository
 - [x] 10A.5 Create remote transaction repository
 
-**Phase 10A Status**: Remote repository layer implemented only. Manual authenticated Supabase verification remains required. Phase 10B-10E have not started.
+**Phase 10A Status**: Remote repository layer implemented and later verified as part of the closed Phase 10 MVP.
 
 ### Phase 10B — Push Sync
 
@@ -512,7 +514,7 @@
 - [x] 10B.4 Mark queue success only after confirmed remote write
 - [x] 10B.5 Recover failed/interrupted items and prevent overlapping explicit runs
 
-**Phase 10B Status**: Explicit push service implemented only. No UI or automatic trigger invokes it yet. Manual verification remains required. Phase 10C-10E have not started.
+**Phase 10B Status**: Explicit push service implemented and later verified as part of the closed Phase 10 MVP.
 
 ### Phase 10C — Pull Sync
 
@@ -521,7 +523,7 @@
 - [x] 10C.3 Skip rows with pending/processing/failed local queue work
 - [x] 10C.4 Return maximum observed remote timestamp without advancing the cursor
 
-**Phase 10C Status**: Explicit pull service implemented only. It is not connected to UI or automatic triggers and does not resolve conflicts or update `last_sync_at`. Manual verification remains required. Phase 10D-10E have not started.
+**Phase 10C Status**: Explicit pull service implemented and later verified as part of the closed Phase 10 MVP.
 
 ### Phase 10D — Conflict Handling and Multi-Device
 
@@ -530,16 +532,96 @@
 - [x] 10D.3 Add explicit conflict-aware push/pull convergence flow
 - [x] 10D.4 Preserve authenticated ownership checks during convergence
 
-**Phase 10D Status**: Conflict resolution and explicit convergence service implemented. Manual bidirectional device, tombstone, equal-timestamp, and cross-user verification remain required. No UI/automatic trigger or `last_sync_at` advancement was added. Phase 10E has not started.
+**Phase 10D Status**: Conflict resolution and explicit convergence service implemented and later verified as part of the closed Phase 10 MVP.
 
 ### Phase 10E — Sync UI, Retry, and Demo Readiness
 
 - [x] 10E.1 Add guarded manual sync action in Settings
 - [x] 10E.2 Display online/offline, never/last synced, syncing, success, partial, pending, and failed states
 - [x] 10E.3 Add non-overlapping manual retry using current-user queue counts and an overlap-safe cursor
-- [ ] 10E.4 Complete offline, retry, conflict, and multi-device demo checklist
+- [x] 10E.4 Complete offline, retry, conflict, and multi-device demo checklist
 
-**Phase 10E Status**: Manual Settings sync is implemented using `convergenceSyncService`, with per-user `last_sync_at`, a five-minute overlap window, current-user device-local queue counts, safe user messages, and repeatable manual retry. No background, app-start, foreground, or connectivity-triggered sync was added. Manual demo verification remains required before Phase 10 is closed.
+**Phase 10E Status**: Manual Settings sync is implemented and manually verified using `convergenceSyncService`, with per-user `last_sync_at`, a five-minute overlap window, current-user device-local queue counts, safe user messages, and repeatable manual retry. No background, app-start, foreground, or connectivity-triggered sync was added. Manual demo verification passed.
+
+**Phase 10 Final Status**: Phase 10 Full Sync MVP is verified and closed. Remote repositories, push sync, pull sync, conflict-aware convergence, manual `Sync Now`, offline behavior, retry behavior, user isolation, no-hard-delete behavior, and `last_sync_at` behavior were manually verified. `npx tsc --noEmit` passed.
+
+### Phase 11 — Post-MVP Sync Hardening and Release Readiness
+
+The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-row upsert, LWW conflict handling, and the full manual sync flow were completed in Phase 10C, 10D, and 10E. Do not implement the old Phase 11.1-11.5 checklist as active code work.
+
+- [x] 11A.1 Close Phase 10 documentation after manual verification
+- [x] 11A.2 Supersede legacy Phase 11 pull-sync checklist
+- [x] 11A.3 Create `PHASE11_HARDENING_RELEASE_READINESS_PLAN.md`
+- [x] 11B.1 Review `last_sync_at` behavior
+- [x] 11B.2 Review retry behavior
+- [x] 11B.3 Review stale queue handling
+- [x] 11B.4 Review duplicate queue and replay behavior
+- [x] 11B.5 Review safe user-facing messages
+- [x] 11C.0 Create data integrity QA checklist and evidence template
+- [x] 11C.1 Validate wallet/category/transaction CRUD after sync
+- [x] 11C.2 Validate dashboard/report formulas remain unchanged
+- [x] 11C.3 Validate transfers after sync
+- [x] 11C.4 Validate tombstones
+- [x] 11C.5 Validate app restart persistence
+- [x] 11D.1 Validate offline create/edit/delete
+- [x] 11D.2 Validate reconnect and `Sync Now`
+- [ ] 11D.3 Validate two-device convergence
+- [ ] 11D.4 Validate expired session behavior
+- [x] 11D.5 Validate RLS isolation
+- [x] 11E.1 Remove obsolete documentation wording
+- [x] 11E.2 Ensure no temporary DEV buttons/scripts remain
+- [x] 11E.3 Ensure `.env.example` is safe
+- [x] 11E.4 Ensure no secrets or local test files are committed
+- [x] 11E.5 Document lint/typecheck checklist
+- [x] 11E.6 Prepare demo script
+
+**Phase 11A Status**: Planning and Phase 10 closure documentation completed only. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed.
+
+**Phase 11B Status**: Sync hardening review completed in `docs/reviews/PHASE11B_SYNC_HARDENING_REVIEW.md`. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed. Review found no blockers or high-severity issues; one medium cursor-hardening tiny patch is recommended before Phase 11C.
+
+**Phase 11B Patch Note**: Cursor hardening patch applied. Manual sync now records the sync-cycle start timestamp as `last_sync_at` after complete convergence success, preserving the existing five-minute overlap and success-only advancement gate. Later Phase 11C/11D/11E statuses are recorded below.
+
+**Phase 11C Documentation Status**: Data integrity QA checklist and evidence template created in `docs/qa/PHASE11C_DATA_INTEGRITY_QA.md`. Later Phase 11C manual QA results are recorded below.
+
+**Phase 11C Partial QA Status**: Historical partial snapshot. Wallet, category, and transaction CRUD after sync passed manual QA (`11C-WALLET-01` through `11C-TRX-03`). Later Phase 11C results below record the remaining 11C.1-11C.5 checks.
+
+**Phase 11C Bugfix Note**: `11C-TRANSFER-01` found a valid UI bug: Wallets screen displayed `opening_balance` instead of derived/current wallet balance after transfers. A small Wallets screen patch now reuses `getWalletBalances(userId)` from the dashboard feature and keeps the existing derived formula unchanged. The transfer retest passed later.
+
+**Phase 11C Transfer Retest Status**: `11C-TRANSFER-01` passed after the Wallets derived balance patch. Source wallet decreases, destination wallet increases, transfer does not count as income/expense, and the existing balance formula remains unchanged. Later Phase 11C statuses record formula, tombstone, and persistence results; user isolation is tracked under Phase 11D.
+
+**Phase 11C Formula QA Status**: `11C-FORMULA-01` passed manually. Verified Income Rp900.000, Expense Rp525.000, Net Cashflow Rp375.000, and Total Balance Rp10.500.000 from Dana Rp800.000 plus Bank BCA Rp9.700.000. Transfers do not count as income/expense.
+
+**Phase 11C Sync Settlement Bugfix Note**: Manual QA found a remote-existing Rp200.000 transfer transaction still had a local pending queue/entity status and `Sync Now` returned partial. The likely cause was strict equivalence causing `EQUAL_TIMESTAMP_MISMATCH` for semantically equivalent rows. Convergence equivalence now compares timestamp fields by parsed time and normalizes `undefined` to `null` for nullable fields without changing LWW rules. Retest is required before considering the pending queue issue resolved.
+
+**Phase 11C Sync Settlement Retest Status**: Retest after equivalence normalization patch passed. `Sync Now` completed, pending local queue became 0, Transfer Pending badge disappeared, Supabase remote row remained safe, and no duplicate remote row was created. Later Phase 11C statuses record tombstone and app restart persistence results.
+
+**Phase 11C Tombstone QA Status**: `11C-TOMBSTONE-01` passed manually. Wallet/category/transaction tombstones were verified: deleted items are hidden from active UI, remote rows remain present, `deleted_at` is populated, no hard delete was observed, and tombstones remain preserved after `Sync Now`. App restart persistence passed later.
+
+**Phase 11C App Restart Persistence QA Status**: `11C-PERSIST-01` passed manually. Full app close/reopen preserved wallet data, transaction data, dashboard values, and reports values. Tombstoned items remained hidden from active UI, Settings showed no new pending/failed queue after restart, and `Sync Now` after restart did not create duplicate data.
+
+**Phase 11C Status**: Phase 11C data integrity QA items `11C.1` through `11C.5` are complete. RLS/user isolation remains tracked under Phase 11D and is not marked complete here.
+
+**Phase 11D Offline QA Status**: `11D.1` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. Offline wallet/category/transaction create worked locally, local edits worked offline, soft deletes worked offline, UI updated from SQLite, pending local queue increased, Supabase was not required for local offline operations, and no crash was observed. Later Phase 11D statuses record 11D.2 and 11D.5 results.
+
+**Phase 11D Reconnect QA Status**: `11D.2` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. Offline-created/edited/deleted data was preserved locally, `Sync Now` after reconnect cleared pending queue to 0, failed count remained 0, Supabase rows were created/updated correctly, tombstones remained intact, no hard delete or duplicate data was observed, and dashboard/report values remained consistent. Later Phase 11D statuses record 11D.3, 11D.4, and 11D.5 outcomes.
+
+**Phase 11D Two-Device QA Deferral**: `11D.3` two-device convergence is intentionally deferred due to test-device availability/time constraints. It remains unchecked and is not considered passed. Retest is required before claiming full multi-device release readiness. `11D.4` is also deferred; `11D.5` passed later.
+
+**Phase 11D Expired Session QA Deferral**: `11D.4` expired-session behavior is intentionally deferred and remains unchecked. Normal logout prevents access to Settings and is not equivalent to expired-session `Sync Now` QA. Retest requires a safe way to invalidate the auth session while the app remains on a screen that can trigger `Sync Now`, or another approved QA strategy. `11D.5` passed later.
+
+**Phase 11D RLS QA Status**: `11D.5` passed manually and is documented in `docs/qa/PHASE11D_OFFLINE_ONLINE_RELEASE_QA.md`. User A only sees User A data, User B only sees User B data, remote rows have correct `user_id` ownership, no cross-user leak was observed, and `Sync Now` did not pull another user's rows.
+
+**Phase 11D Status**: `11D.1`, `11D.2`, and `11D.5` are complete. `11D.3` two-device convergence and `11D.4` expired-session behavior are deferred and not considered passed. Phase 11D is not claimed as fully passed because deferred items remain.
+
+**Phase 11E.1-11E.2 Cleanup Status**: Obsolete documentation wording was updated to reflect current Phase 10/11 status. Review found no temporary DEV sync buttons, reset/wipe scripts, or production-reachable debug sync UI. Production `Sync Now` remains the approved Phase 10E manual sync action. Logging policy cleanup remains an owner decision and is not treated as a completed runtime change.
+
+**Phase 11E.3-11E.4 Cleanup Status**: `.env.example` was verified as placeholder-only. Git safety checks confirmed `.env` is local-only and not present in git history; `.expo/` is ignored; `.claude/settings.json` is tracked and remains an owner decision. `.gitignore` was hardened for env variants, local SQLite files, keystore/certificate files, and credential artifacts. No runtime behavior changed.
+
+**Phase 11E.5 Static Check Status**: `npm run typecheck` exists and runs `tsc --noEmit`. Typecheck result from 11E.5A: PASS. Lint result: NOT AVAILABLE because no project-level ESLint config or lint dependency is present. Owner decision: do not add ESLint/lint tooling in Phase 11E; lint setup is deferred to a future owner-approved task. `11E.5` is complete with this documented limitation. No runtime, schema, sync, Supabase config, or logging behavior changed.
+
+**Phase 11E.6 Release Demo Script Status**: Release demo script created in `docs/qa/PHASE11E_RELEASE_DEMO_SCRIPT.md`. The script documents the approved MVP demo flow, current release boundaries, preconditions, manual sync demo steps, RLS isolation smoke check, negative/deferred items, pass/fail checklist, troubleshooting notes, and references. It does not claim Phase 11D fully passed, does not mark two-device convergence or expired-session behavior as passed, and does not claim lint coverage. No runtime, schema, sync, Supabase config, or logging behavior changed.
+
+**Phase 11E Status**: Phase 11E release-readiness cleanup is complete with documented limitations. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed. Lint remains unavailable/deferred by owner decision. Typecheck passed during 11E.5.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
@@ -584,7 +666,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 
 ## Phase 11 — Post-MVP Sync Hardening and Release Readiness
 
-**Scope note**: Pull sync moved to Phase 10C. Any legacy pull-sync checklist retained below is superseded and must not be treated as the active Phase 11 plan. Phase 11 requires a separate approved hardening/release-readiness plan.
+**Legacy scope note**: Pull sync moved to Phase 10C. The checklist retained below is superseded and must not be treated as the active Phase 11 plan. The active Phase 11 plan is now **Phase 11 — Post-MVP Sync Hardening and Release Readiness**, with details in `PHASE11_HARDENING_RELEASE_READINESS_PLAN.md`.
 
 - [ ] 11.1 Implement remote query updated after timestamp
   - Wallets updated after last_sync_at.
@@ -736,8 +818,8 @@ The MVP is complete only when all items below are true:
 - [ ] User can see dashboard summary.
 - [ ] User can use the app while offline.
 - [ ] User can add transaction while offline.
-- [ ] User can sync pending data after online.
-- [ ] User can see pending/failed sync state.
-- [ ] Supabase RLS prevents cross-user data access.
+- [x] User can sync pending data after online.
+- [x] User can see pending/failed sync state.
+- [x] Supabase RLS prevents cross-user data access.
 - [ ] Local data persists after app restart.
 - [ ] Basic unit and repository tests pass.

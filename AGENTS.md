@@ -29,7 +29,7 @@ These rules **MUST NOT** be violated. They are foundational to the offline-first
 
 - **NEVER** write wallet, category, or transaction data directly to Supabase.
 - **ALWAYS** write to local SQLite first, then add to `sync_queue`.
-- Sync to Supabase happens asynchronously in the background.
+- Sync to Supabase happens asynchronously through the approved manual sync flow.
 - If sync fails, data remains local and is retried later.
 
 ### 2. Never Bypass SQLite
@@ -90,7 +90,7 @@ These rules **MUST NOT** be violated. They are foundational to the offline-first
 
 - **All application tables use custom schema**: `financetracker`
 - **Supabase Auth remains in default**: `auth.users` (managed by Supabase)
-- **Future table structure** (Phase 9+):
+- **Application table structure** (implemented from Phase 9+):
   - `financetracker.profiles`
   - `financetracker.wallets`
   - `financetracker.categories`
@@ -99,8 +99,8 @@ These rules **MUST NOT** be violated. They are foundational to the offline-first
   - Clean separation from Supabase managed tables
   - Easier migrations and schema management
   - Clear ownership and namespace isolation
-- **Implementation**: Phase 9 (Supabase Remote Schema and RLS)
-- **Current Phase**: Not yet implemented (Phase 3 complete - local auth only)
+- **Implementation**: Phase 9 (Supabase Remote Schema and RLS), followed by Phase 10 manual sync.
+- **Current Phase**: Phase 11E release-readiness cleanup. Phase 10 Full Sync MVP is closed; Phase 11D still has deferred checks for two-device convergence and expired-session behavior.
 
 ---
 
@@ -502,7 +502,12 @@ Follow the phase sequence strictly. Do not skip ahead.
    - Finish MVP acceptance criteria before adding enhancements.
    - MVP acceptance criteria are listed in `requirements.md` Section 9.
 
-4. **Current Phase Status** (as of this document creation):
+4. **Current Phase Status**:
+   - Phase 0-10: Complete through Full Sync MVP.
+   - Phase 11A-11D: Hardening and manual QA mostly complete, with 11D.3 two-device convergence and 11D.4 expired-session behavior deferred.
+   - Phase 11E: Release-readiness cleanup in progress.
+
+5. **Historical Phase Status** (superseded):
    - ✅ Phase 0: Project Setup - Complete
    - ✅ Phase 1: Local Database Foundation - Complete
    - ✅ Phase 2: Core Utilities - Complete
@@ -635,7 +640,7 @@ These rules ensure incremental, reviewable progress:
 
 4. **Offline-First Principle** (Foundational):
    - Runtime data **must** come from local SQLite first
-   - Supabase sync/schema/RLS **only** in approved phase
+   - Supabase sync/schema/RLS only in approved phases
    - Do not bypass SQLite for financial data
 
 5. **Scope Discipline**:
@@ -771,5 +776,5 @@ Phase 9 Planning (repeat cycle)
 
 ---
 
-**Last Updated**: Phase 8 Completion (Post-Phase 8 Verification)  
+**Last Updated**: Phase 11E Release Readiness Cleanup  
 **Status**: Authoritative guide for all contributors (AI and human)

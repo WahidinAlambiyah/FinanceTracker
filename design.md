@@ -64,10 +64,10 @@ Update UI from local SQLite
 Show pending sync badge
 ```
 
-### 4.2 Sync When Online
+### 4.2 Manual Sync When Online
 
 ```text
-Network becomes online or user taps Sync
+User taps Settings -> Sync Now
   ↓
 Read pending sync_queue items
   ↓
@@ -81,6 +81,8 @@ Upsert remote changes into SQLite
   ↓
 Update last_sync_at
 ```
+
+Current MVP behavior is manual sync only. Automatic background, app-start, foreground, or connectivity-triggered sync is future work and must not be assumed from the online-state diagram.
 
 ## 5. Suggested Folder Structure
 
@@ -441,7 +443,7 @@ CREATE TABLE IF NOT EXISTS sync_metadata (
 
 **Implementation Phase:** Phase 9 (Supabase Remote Schema and RLS)
 
-**Note:** The following schema definitions are for Phase 9+ implementation. Current runtime financial data remains SQLite-first. Phase 9 prepares remote tables and RLS only; it must not add remote push/pull sync, remote repositories, sync queue processing, or Supabase financial reads/writes in the app.
+**Note:** The following schema definitions were introduced for Phase 9+ implementation. Current runtime financial data remains SQLite-first. Supabase application tables are remote persistence for the approved manual sync flow; screens and ordinary financial services must not write financial records directly to Supabase.
 
 **Phase 9 boundaries:**
 - Do not create a remote `sync_queue` table for MVP unless separately approved.

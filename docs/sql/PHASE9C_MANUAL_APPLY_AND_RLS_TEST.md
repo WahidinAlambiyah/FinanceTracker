@@ -1,6 +1,8 @@
 # Phase 9C Manual Apply and RLS Test Guide
 
-**Status**: Guide prepared; manual Supabase execution not started  
+> Current status: This guide is historical. Phase 9 schema/RLS setup was followed by Phase 10 Full Sync MVP and Phase 11D RLS isolation QA. Do not read the pending checklist below as current Phase 11E status.
+
+**Status**: Historical guide retained for reference  
 **SQL draft**: `docs/sql/phase9b_financetracker_schema_rls.sql`
 
 This guide is documentation only. Do not apply the SQL until the Phase 9B draft and target Supabase project have been reviewed and approved.
@@ -13,7 +15,7 @@ This guide is documentation only. Do not apply the SQL until the Phase 9B draft 
 - [ ] Confirm the draft contains only the `financetracker` schema, four application tables, grants, RLS, policies, and a commented rollback section.
 - [ ] Confirm no application code currently depends on the remote financial tables.
 - [ ] Confirm runtime financial reads/writes remain SQLite-first.
-- [ ] Confirm Phase 10 push sync and Phase 11 pull sync have not started.
+- [ ] Historical pre-Phase-10 check: confirm push/pull sync had not started before applying this guide.
 - [ ] Record who approved the SQL and when it is applied.
 
 ## 2. Manual Apply Steps

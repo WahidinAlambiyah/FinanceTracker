@@ -1,5 +1,7 @@
 # Phase 9 Plan - Supabase Remote Schema and RLS
 
+> Current status: This plan is historical. Phase 9 schema/RLS work was followed by Phase 10 Full Sync MVP, which is now closed. Supabase is no longer Auth-only; it is remote persistence for manual sync, while SQLite remains the runtime source of truth.
+
 **Status**: Planning complete, awaiting implementation approval  
 **Recommended first step**: Documentation-only Phase 9A  
 **Dependencies**: Phase 8 approved and closed
