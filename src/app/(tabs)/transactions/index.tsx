@@ -64,7 +64,7 @@ export default function TransactionsScreen() {
       if (transactionsResult.success && transactionsResult.data) {
         setTransactions(transactionsResult.data);
       } else {
-        Alert.alert('Error', transactionsResult.error || 'Failed to load transactions');
+        Alert.alert('Could not load transactions', 'Please pull to refresh or try another month.');
       }
 
       // Load monthly summary
@@ -74,7 +74,7 @@ export default function TransactionsScreen() {
         setSummary(summaryResult.data);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load transactions');
+      Alert.alert('Could not load transactions', 'Please pull to refresh or try another month.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -276,13 +276,15 @@ export default function TransactionsScreen() {
               {typeIcon}
             </Text>
             <View style={styles.transactionInfo}>
-              <Text style={styles.transactionLabel}>{displayLabel}</Text>
-              <Text style={styles.transactionMeta}>
+              <Text style={styles.transactionLabel} numberOfLines={1} ellipsizeMode="tail">
+                {displayLabel}
+              </Text>
+              <Text style={styles.transactionMeta} numberOfLines={1} ellipsizeMode="tail">
                 {walletInfo && `${walletInfo} • `}
                 {formatIndonesianDate(item.transaction_date).split(',')[0]}
               </Text>
               {item.note && (
-                <Text style={styles.transactionNote} numberOfLines={1}>
+                <Text style={styles.transactionNote} numberOfLines={1} ellipsizeMode="tail">
                   {item.note}
                 </Text>
               )}
@@ -290,7 +292,11 @@ export default function TransactionsScreen() {
           </View>
 
           <View style={styles.transactionRight}>
-            <Text style={[styles.transactionAmount, { color: typeColor }]}>
+            <Text
+              style={[styles.transactionAmount, { color: typeColor }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {formatRupiah(item.amount)}
             </Text>
             {item.sync_status === 'pending' && (
@@ -316,7 +322,7 @@ export default function TransactionsScreen() {
     <View style={styles.emptyState}>
       <Text style={styles.emptyStateTitle}>No transactions yet</Text>
       <Text style={styles.emptyStateText}>
-        Add your first transaction to start tracking your finances
+        Add income, expense, or transfer records to start tracking your money.
       </Text>
       <TouchableOpacity 
         style={styles.emptyStateButton}
@@ -331,7 +337,7 @@ export default function TransactionsScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#2563EB" />
-        <Text style={styles.loadingText}>Loading transactions...</Text>
+        <Text style={styles.loadingText}>Loading this month's transactions...</Text>
       </View>
     );
   }
@@ -493,6 +499,7 @@ const styles = StyleSheet.create({
   },
   transactionInfo: {
     flex: 1,
+    minWidth: 0,
   },
   transactionLabel: {
     fontSize: 16,
@@ -512,11 +519,14 @@ const styles = StyleSheet.create({
   },
   transactionRight: {
     alignItems: 'flex-end',
+    marginLeft: 12,
+    flexShrink: 0,
   },
   transactionAmount: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
+    maxWidth: 140,
   },
   syncBadge: {
     borderRadius: 4,

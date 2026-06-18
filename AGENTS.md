@@ -552,6 +552,45 @@ The **User** should handle:
 
 ---
 
+## Codex / AI Coding Agent Session Rules
+
+Before starting any coding task, Codex or any AI coding agent must read:
+1. AGENTS.md
+2. tasks.md
+3. design.md
+4. requirements.md
+5. The active phase plan or QA document if relevant
+
+AGENTS.md is the primary rule source.
+If there is conflict:
+1. User’s latest explicit instruction wins.
+2. AGENTS.md wins over older phase docs.
+3. tasks.md is the source of truth for current phase/task status.
+4. Historical phase plans are reference only unless explicitly reactivated.
+
+Command rule:
+Do not run terminal commands unless the user explicitly approved them in the prompt.
+Only run commands listed in the approved command list.
+If a required command is not listed, stop and ask the user.
+
+Git rule:
+Do not create branch, commit, push, merge, or rebase unless explicitly approved in the prompt.
+
+Architecture rule:
+SQLite remains the runtime source of truth.
+Supabase is remote persistence only.
+UI/screens must not directly write financial data to Supabase.
+Manual Sync Now remains the only approved sync trigger unless a later phase explicitly changes this.
+
+Phase 12 status:
+12A complete.
+12B complete and merged.
+12C in progress or pending depending on tasks.md.
+12D and 12E pending.
+11D.3 and 11D.4 remain deferred/not passed.
+
+---
+
 ### ChatGPT Responsibilities
 
 **ChatGPT** (non-coding AI assistant) should handle:

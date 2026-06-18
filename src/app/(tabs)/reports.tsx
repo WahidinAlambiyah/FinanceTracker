@@ -52,10 +52,10 @@ export default function ReportsScreen() {
       if (result.success && result.data) {
         setReport(result.data);
       } else {
-        Alert.alert('Error', result.error || 'Failed to load report');
+        Alert.alert('Could not load report', 'Please pull to refresh or try another month.');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load report');
+      Alert.alert('Could not load report', 'Please pull to refresh or try another month.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -211,7 +211,9 @@ export default function ReportsScreen() {
       return (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Expense by Category</Text>
-          <Text style={styles.emptyText}>No expense transactions this month</Text>
+          <Text style={styles.emptyText}>
+            No expense data yet. Add expense transactions to see category insights.
+          </Text>
         </View>
       );
     }
@@ -226,9 +228,15 @@ export default function ReportsScreen() {
                 {item.category_color && (
                   <View style={[styles.colorDot, { backgroundColor: item.category_color }]} />
                 )}
-                <Text style={styles.categoryName}>{item.category_name}</Text>
+                <Text style={styles.categoryName} numberOfLines={1} ellipsizeMode="tail">
+                  {item.category_name}
+                </Text>
               </View>
-              <Text style={[styles.categoryAmount, styles.expenseText]}>
+              <Text
+                style={[styles.categoryAmount, styles.expenseText]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {formatRupiah(item.total)}
               </Text>
             </View>
@@ -251,7 +259,9 @@ export default function ReportsScreen() {
       return (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Income by Category</Text>
-          <Text style={styles.emptyText}>No income transactions this month</Text>
+          <Text style={styles.emptyText}>
+            No income data yet. Add income transactions to see category insights.
+          </Text>
         </View>
       );
     }
@@ -266,9 +276,15 @@ export default function ReportsScreen() {
                 {item.category_color && (
                   <View style={[styles.colorDot, { backgroundColor: item.category_color }]} />
                 )}
-                <Text style={styles.categoryName}>{item.category_name}</Text>
+                <Text style={styles.categoryName} numberOfLines={1} ellipsizeMode="tail">
+                  {item.category_name}
+                </Text>
               </View>
-              <Text style={[styles.categoryAmount, styles.incomeText]}>
+              <Text
+                style={[styles.categoryAmount, styles.incomeText]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {formatRupiah(item.total)}
               </Text>
             </View>
@@ -291,7 +307,9 @@ export default function ReportsScreen() {
       return (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Wallet Balances</Text>
-          <Text style={styles.emptyText}>No wallets yet</Text>
+          <Text style={styles.emptyText}>
+            No wallet balances yet. Create a wallet to start tracking your money.
+          </Text>
         </View>
       );
     }
@@ -301,11 +319,15 @@ export default function ReportsScreen() {
         <Text style={styles.cardTitle}>Wallet Balances</Text>
         {report.walletBalances.map((wallet) => (
           <View key={wallet.wallet_id} style={styles.walletItem}>
-            <View>
-              <Text style={styles.walletName}>{wallet.wallet_name}</Text>
+            <View style={styles.walletDetails}>
+              <Text style={styles.walletName} numberOfLines={1} ellipsizeMode="tail">
+                {wallet.wallet_name}
+              </Text>
               <Text style={styles.walletType}>{wallet.wallet_type}</Text>
             </View>
-            <Text style={styles.walletBalance}>{formatRupiah(wallet.balance)}</Text>
+            <Text style={styles.walletBalance} numberOfLines={1} ellipsizeMode="tail">
+              {formatRupiah(wallet.balance)}
+            </Text>
           </View>
         ))}
       </View>
@@ -316,7 +338,7 @@ export default function ReportsScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#2563EB" />
-        <Text style={styles.loadingText}>Loading report...</Text>
+        <Text style={styles.loadingText}>Loading monthly report...</Text>
       </View>
     );
   }
@@ -448,6 +470,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0,
   },
   colorDot: {
     width: 12,
@@ -459,10 +482,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#0F172A',
+    flexShrink: 1,
   },
   categoryAmount: {
     fontSize: 14,
     fontWeight: '600',
+    marginLeft: 12,
+    flexShrink: 0,
   },
   barContainer: {
     height: 8,
@@ -487,11 +513,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
+  walletDetails: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: 12,
+  },
   walletName: {
     fontSize: 14,
     fontWeight: '500',
     color: '#0F172A',
     marginBottom: 2,
+    flexShrink: 1,
   },
   walletType: {
     fontSize: 12,
@@ -502,6 +534,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#2563EB',
+    flexShrink: 0,
   },
   emptyText: {
     fontSize: 14,

@@ -56,10 +56,10 @@ export default function WalletsScreen() {
           setWalletBalances({});
         }
       } else {
-        Alert.alert('Error', result.error || 'Failed to load wallets');
+        Alert.alert('Could not load wallets', 'Please pull to refresh or reopen the app.');
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load wallets');
+      Alert.alert('Could not load wallets', 'Please pull to refresh or reopen the app.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -184,13 +184,17 @@ export default function WalletsScreen() {
       >
         <View style={styles.walletCardHeader}>
           <View style={styles.walletCardTitle}>
-            <Text style={styles.walletName}>{item.name}</Text>
+            <Text style={styles.walletName} numberOfLines={1} ellipsizeMode="tail">
+              {item.name}
+            </Text>
             {renderWalletTypeBadge(item.type)}
           </View>
           {renderSyncStatus(item.sync_status)}
         </View>
 
-        <Text style={styles.walletBalance}>{formatRupiah(currentBalance)}</Text>
+        <Text style={styles.walletBalance} numberOfLines={1} ellipsizeMode="tail">
+          {formatRupiah(currentBalance)}
+        </Text>
 
         <Text style={styles.walletHelper}>
           Current balance is calculated from transactions.
@@ -204,9 +208,9 @@ export default function WalletsScreen() {
    */
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyStateTitle}>No Wallets Yet</Text>
+      <Text style={styles.emptyStateTitle}>No wallets yet</Text>
       <Text style={styles.emptyStateText}>
-        Create your first wallet to start tracking your finances
+        Create a wallet to start tracking your cash, bank, or e-wallet balance.
       </Text>
       <TouchableOpacity style={styles.emptyStateButton} onPress={handleAddWallet}>
         <Text style={styles.emptyStateButtonText}>Add Wallet</Text>
@@ -218,7 +222,7 @@ export default function WalletsScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#2563EB" />
-        <Text style={styles.loadingText}>Loading wallets...</Text>
+        <Text style={styles.loadingText}>Loading your wallets...</Text>
       </View>
     );
   }
@@ -287,12 +291,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    minWidth: 0,
   },
   walletName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#0F172A',
     marginRight: 8,
+    flexShrink: 1,
   },
   typeBadge: {
     backgroundColor: '#EFF6FF',
@@ -309,6 +315,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 2,
+    marginLeft: 8,
   },
   syncBadgeText: {
     fontSize: 11,
@@ -320,6 +327,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0F172A',
     marginBottom: 4,
+    flexShrink: 1,
   },
   walletHelper: {
     fontSize: 12,
