@@ -573,7 +573,7 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 - [x] 11E.3 Ensure `.env.example` is safe
 - [x] 11E.4 Ensure no secrets or local test files are committed
 - [x] 11E.5 Document lint/typecheck checklist
-- [ ] 11E.6 Prepare demo script
+- [x] 11E.6 Prepare demo script
 
 **Phase 11A Status**: Planning and Phase 10 closure documentation completed only. No runtime code, SQLite schema, Supabase SQL, dependencies, dashboard formulas, or report formulas changed.
 
@@ -617,7 +617,11 @@ The legacy Phase 11 pull-sync checklist is superseded. Pull sync, local remote-r
 
 **Phase 11E.3-11E.4 Cleanup Status**: `.env.example` was verified as placeholder-only. Git safety checks confirmed `.env` is local-only and not present in git history; `.expo/` is ignored; `.claude/settings.json` is tracked and remains an owner decision. `.gitignore` was hardened for env variants, local SQLite files, keystore/certificate files, and credential artifacts. No runtime behavior changed.
 
-**Phase 11E.5 Static Check Status**: `npm run typecheck` exists and runs `tsc --noEmit`. Typecheck result from 11E.5A: PASS. Lint result: NOT AVAILABLE because no project-level ESLint config or lint dependency is present. Owner decision: do not add ESLint/lint tooling in Phase 11E; lint setup is deferred to a future owner-approved task. `11E.5` is complete with this documented limitation. No runtime, schema, sync, Supabase config, or logging behavior changed. `11E.6` remains open.
+**Phase 11E.5 Static Check Status**: `npm run typecheck` exists and runs `tsc --noEmit`. Typecheck result from 11E.5A: PASS. Lint result: NOT AVAILABLE because no project-level ESLint config or lint dependency is present. Owner decision: do not add ESLint/lint tooling in Phase 11E; lint setup is deferred to a future owner-approved task. `11E.5` is complete with this documented limitation. No runtime, schema, sync, Supabase config, or logging behavior changed.
+
+**Phase 11E.6 Release Demo Script Status**: Release demo script created in `docs/qa/PHASE11E_RELEASE_DEMO_SCRIPT.md`. The script documents the approved MVP demo flow, current release boundaries, preconditions, manual sync demo steps, RLS isolation smoke check, negative/deferred items, pass/fail checklist, troubleshooting notes, and references. It does not claim Phase 11D fully passed, does not mark two-device convergence or expired-session behavior as passed, and does not claim lint coverage. No runtime, schema, sync, Supabase config, or logging behavior changed.
+
+**Phase 11E Status**: Phase 11E release-readiness cleanup is complete with documented limitations. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed. Lint remains unavailable/deferred by owner decision. Typecheck passed during 11E.5.
 
 ### Legacy Phase 10 Checklist (Superseded)
 
