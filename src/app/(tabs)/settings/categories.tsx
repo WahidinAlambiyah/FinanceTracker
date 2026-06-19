@@ -165,10 +165,11 @@ export default function CategoriesScreen() {
    * Handle form submission (create or update)
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!user) return;
 
     if (!formName.trim()) {
-      Alert.alert('Validation Error', 'Category name is required');
+      Alert.alert('Check category details', 'Enter a category name before saving.');
       return;
     }
 
@@ -189,7 +190,7 @@ export default function CategoriesScreen() {
           setIsModalVisible(false);
           loadCategories();
         } else {
-          Alert.alert('Error', result.error || 'Failed to create category');
+          Alert.alert('Could not create category', 'Please check the category details and try again.');
         }
       } else {
         if (!editingCategory) return;
@@ -206,11 +207,11 @@ export default function CategoriesScreen() {
           setIsModalVisible(false);
           loadCategories();
         } else {
-          Alert.alert('Error', result.error || 'Failed to update category');
+          Alert.alert('Could not update category', 'Please check the category details and try again.');
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Could not save category', 'Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -224,7 +225,7 @@ export default function CategoriesScreen() {
     
     Alert.alert(
       'Delete Category',
-      `Are you sure you want to delete "${category.name}"?${defaultWarning}`,
+      `Delete "${category.name}"?${defaultWarning}\n\nDeleted categories are hidden from active lists and kept for sync history.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -238,7 +239,7 @@ export default function CategoriesScreen() {
             if (result.success) {
               loadCategories();
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete category');
+              Alert.alert('Could not delete category', 'Please try again.');
             }
           },
         },

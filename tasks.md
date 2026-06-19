@@ -706,12 +706,14 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 - [x] 12A Product polish and Settings UX review
 - [x] 12B Settings UX polish
 - [x] 12C Empty/loading/error state polish
-- [ ] 12D Form validation and confirmation polish
+- [x] 12D Form validation and confirmation polish
 - [ ] 12E Final polish verification
 
 **Phase 12B Status**: User-facing Settings and sync copy was polished only. Raw user ID is hidden from normal Settings UI, technical queue wording was replaced with clearer user-facing labels, manual `Sync Now` behavior is explained, and internal roadmap/phase wording is not shown to users. Validation follow-up passed with `npm.cmd run typecheck`. No sync behavior, SQLite schema, Supabase config/RLS, dependencies, or runtime data flow changed. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 **Phase 12C Status**: Empty, loading, and error state copy was polished for Dashboard, Reports, Wallets, Transactions, and Categories. Minor text overflow protection was added for visible list/card labels and amount rows. Validation passed with `npm.cmd run typecheck`. No sync behavior, auth behavior, SQLite schema, Supabase config/RLS, dependencies, runtime data flow, or financial formulas changed. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
+
+**Phase 12D Status**: Form validation and confirmation polish is complete. Submit handlers now guard against duplicate submissions, transaction transfer forms clear an invalid destination wallet when the source changes to the same wallet, and date helper copy uses product wording instead of internal phase wording. Validation passed with `npm.cmd run typecheck`. No SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, dependencies, navigation structure, repository/service logic, data model, or financial formula changes were made. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 <!-- Legacy Phase 12 checklist retained below for requirements traceability. -->
 

@@ -69,7 +69,7 @@ export default function EditTransactionScreen() {
         // Load transaction
         const txResult = await getTransactionById(user!.id, id!);
         if (!txResult.success || !txResult.data) {
-          Alert.alert('Error', txResult.error || 'Failed to load transaction', [
+          Alert.alert('Could not load transaction', 'Please go back and try again.', [
             { text: 'OK', onPress: () => router.back() },
           ]);
           return;
@@ -127,6 +127,9 @@ export default function EditTransactionScreen() {
    */
   const handleWalletSelect = (wallet: Wallet) => {
     setSelectedWallet(wallet);
+    if (transaction?.type === 'transfer' && selectedDestinationWallet?.id === wallet.id) {
+      setSelectedDestinationWallet(null);
+    }
     setShowWalletModal(false);
   };
 
@@ -150,6 +153,7 @@ export default function EditTransactionScreen() {
    * Handle delete with confirmation
    */
   const handleDelete = () => {
+    if (isSubmitting) return;
     if (!transaction || !user) return;
 
     const typeLabel =
@@ -174,7 +178,7 @@ export default function EditTransactionScreen() {
                 { text: 'OK', onPress: () => router.back() },
               ]);
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete transaction');
+              Alert.alert('Could not delete transaction', 'Please try again.');
               setIsSubmitting(false);
             }
           },
@@ -187,33 +191,39 @@ export default function EditTransactionScreen() {
    * Handle form submission
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!user || !transaction) return;
 
     // Validation
     if (!selectedWallet) {
-      Alert.alert('Validation Error', 'Please select a wallet');
+      Alert.alert('Check transaction details', 'Select the wallet for this transaction.');
       return;
     }
 
     if (transaction.type === 'transfer' && !selectedDestinationWallet) {
-      Alert.alert('Validation Error', 'Please select a destination wallet');
+      Alert.alert('Check transaction details', 'Select the destination wallet for this transfer.');
+      return;
+    }
+
+    if (transaction.type === 'transfer' && selectedDestinationWallet?.id === selectedWallet.id) {
+      Alert.alert('Check transaction details', 'Choose a different destination wallet for this transfer.');
       return;
     }
 
     if ((transaction.type === 'income' || transaction.type === 'expense') && !selectedCategory) {
-      Alert.alert('Validation Error', `Please select a ${transaction.type} category`);
+      Alert.alert('Check transaction details', `Select a ${transaction.type} category for this transaction.`);
       return;
     }
 
     if (!amount.trim()) {
-      Alert.alert('Validation Error', 'Please enter an amount');
+      Alert.alert('Check transaction details', 'Enter an amount before saving.');
       return;
     }
 
     // Parse amount
     const parsedAmount = parseRupiahInput(amount);
     if (parsedAmount === null || parsedAmount <= 0) {
-      Alert.alert('Validation Error', 'Invalid amount format');
+      Alert.alert('Check transaction details', 'Use a valid amount greater than zero, such as 50000 or 50k.');
       return;
     }
 
@@ -241,7 +251,7 @@ export default function EditTransactionScreen() {
       // Check if any fields changed
       const hasChanges = Object.values(input).some((value) => value !== undefined);
       if (!hasChanges) {
-        Alert.alert('No Changes', 'No changes were made to the transaction');
+        Alert.alert('No changes to save', 'Update at least one field before saving.');
         setIsSubmitting(false);
         return;
       }
@@ -249,14 +259,14 @@ export default function EditTransactionScreen() {
       const result = await updateTransaction(user.id, transaction.id, input);
 
       if (result.success) {
-        Alert.alert('Success', 'Transaction updated successfully', [
+        Alert.alert('Transaction updated', 'Your transaction changes have been saved.', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Error', result.error || 'Failed to update transaction');
+        Alert.alert('Could not update transaction', 'Please check the transaction details and try again.');
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Could not update transaction', 'Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -487,7 +497,7 @@ export default function EditTransactionScreen() {
               </Text>
             </View>
             <Text style={styles.helperText}>
-              Date editing will be available in future phase
+              Date is set automatically for now.
             </Text>
           </View>
         </View>
