@@ -110,7 +110,7 @@ export default function SettingsScreen() {
             const result = await signOut();
 
             if (result.error) {
-              Alert.alert('Error', result.error);
+              Alert.alert('Could not sign out', 'Please try again.');
               setIsLoggingOut(false);
               return;
             }
