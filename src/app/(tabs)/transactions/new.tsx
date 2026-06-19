@@ -110,6 +110,9 @@ export default function AddTransactionScreen() {
    */
   const handleWalletSelect = (wallet: Wallet) => {
     setSelectedWallet(wallet);
+    if (type === 'transfer' && selectedDestinationWallet?.id === wallet.id) {
+      setSelectedDestinationWallet(null);
+    }
     setShowWalletModal(false);
   };
 
@@ -133,33 +136,39 @@ export default function AddTransactionScreen() {
    * Handle form submission
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!user) return;
 
     // Validation
     if (!selectedWallet) {
-      Alert.alert('Validation Error', 'Please select a wallet');
+      Alert.alert('Check transaction details', 'Select the wallet for this transaction.');
       return;
     }
 
     if (type === 'transfer' && !selectedDestinationWallet) {
-      Alert.alert('Validation Error', 'Please select a destination wallet');
+      Alert.alert('Check transaction details', 'Select the destination wallet for this transfer.');
+      return;
+    }
+
+    if (type === 'transfer' && selectedDestinationWallet?.id === selectedWallet.id) {
+      Alert.alert('Check transaction details', 'Choose a different destination wallet for this transfer.');
       return;
     }
 
     if ((type === 'income' || type === 'expense') && !selectedCategory) {
-      Alert.alert('Validation Error', `Please select a ${type} category`);
+      Alert.alert('Check transaction details', `Select a ${type} category for this transaction.`);
       return;
     }
 
     if (!amount.trim()) {
-      Alert.alert('Validation Error', 'Please enter an amount');
+      Alert.alert('Check transaction details', 'Enter an amount before saving.');
       return;
     }
 
     // Parse amount
     const parsedAmount = parseRupiahInput(amount);
     if (parsedAmount === null || parsedAmount <= 0) {
-      Alert.alert('Validation Error', 'Invalid amount format');
+      Alert.alert('Check transaction details', 'Use a valid amount greater than zero, such as 50000 or 50k.');
       return;
     }
 
@@ -179,14 +188,14 @@ export default function AddTransactionScreen() {
       const result = await createTransaction(user.id, input);
 
       if (result.success) {
-        Alert.alert('Success', 'Transaction added successfully', [
+        Alert.alert('Transaction added', 'Your transaction has been saved.', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Error', result.error || 'Failed to create transaction');
+        Alert.alert('Could not add transaction', result.error || 'Please check the transaction details and try again.');
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Could not add transaction', 'Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -455,7 +464,7 @@ export default function AddTransactionScreen() {
               </Text>
             </View>
             <Text style={styles.helperText}>
-              Default: current date/time (editing date in future phase)
+              Date is set automatically for now.
             </Text>
           </View>
         </View>

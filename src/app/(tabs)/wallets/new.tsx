@@ -35,23 +35,24 @@ export default function AddWalletScreen() {
    * Handle form submission
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!user) return;
 
     // Basic client-side validation
     if (!name.trim()) {
-      Alert.alert('Validation Error', 'Wallet name is required');
+      Alert.alert('Check wallet details', 'Enter a wallet name before saving.');
       return;
     }
 
     if (!openingBalance.trim()) {
-      Alert.alert('Validation Error', 'Opening balance is required');
+      Alert.alert('Check wallet details', 'Enter an opening balance before saving.');
       return;
     }
 
     // Parse opening balance
     const parsedBalance = parseRupiahInput(openingBalance);
     if (parsedBalance === null) {
-      Alert.alert('Validation Error', 'Invalid opening balance format');
+      Alert.alert('Check wallet details', 'Use a valid opening balance, such as 1000000 or 1jt.');
       return;
     }
 
@@ -67,14 +68,14 @@ export default function AddWalletScreen() {
       const result = await createWallet(user.id, input);
 
       if (result.success) {
-        Alert.alert('Success', 'Wallet created successfully', [
+        Alert.alert('Wallet created', 'Your wallet has been saved.', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Error', result.error || 'Failed to create wallet');
+        Alert.alert('Could not create wallet', result.error || 'Please check the wallet details and try again.');
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Could not create wallet', 'Please try again.');
     } finally {
       setIsSubmitting(false);
     }

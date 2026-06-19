@@ -70,11 +70,12 @@ export default function EditWalletScreen() {
    * Handle form submission
    */
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!user || !wallet) return;
 
     // Basic client-side validation
     if (!name.trim()) {
-      Alert.alert('Validation Error', 'Wallet name is required');
+      Alert.alert('Check wallet details', 'Enter a wallet name before saving.');
       return;
     }
 
@@ -89,14 +90,14 @@ export default function EditWalletScreen() {
       const result = await updateWallet(user.id, wallet.id, input);
 
       if (result.success) {
-        Alert.alert('Success', 'Wallet updated successfully', [
+        Alert.alert('Wallet updated', 'Your wallet changes have been saved.', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Error', result.error || 'Failed to update wallet');
+        Alert.alert('Could not update wallet', result.error || 'Please check the wallet details and try again.');
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Could not update wallet', 'Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +199,7 @@ export default function EditWalletScreen() {
               </Text>
             </View>
             <Text style={styles.helperText}>
-              Opening balance cannot be changed after wallet creation. Future transactions will affect wallet balance.
+              Opening balance cannot be changed after wallet creation. New transactions affect the current balance.
             </Text>
           </View>
         </View>
