@@ -69,7 +69,7 @@ export default function EditTransactionScreen() {
         // Load transaction
         const txResult = await getTransactionById(user!.id, id!);
         if (!txResult.success || !txResult.data) {
-          Alert.alert('Error', txResult.error || 'Failed to load transaction', [
+          Alert.alert('Could not load transaction', 'Please go back and try again.', [
             { text: 'OK', onPress: () => router.back() },
           ]);
           return;
@@ -178,7 +178,7 @@ export default function EditTransactionScreen() {
                 { text: 'OK', onPress: () => router.back() },
               ]);
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete transaction');
+              Alert.alert('Could not delete transaction', 'Please try again.');
               setIsSubmitting(false);
             }
           },
@@ -263,7 +263,7 @@ export default function EditTransactionScreen() {
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Could not update transaction', result.error || 'Please check the transaction details and try again.');
+        Alert.alert('Could not update transaction', 'Please check the transaction details and try again.');
       }
     } catch (error) {
       Alert.alert('Could not update transaction', 'Please try again.');

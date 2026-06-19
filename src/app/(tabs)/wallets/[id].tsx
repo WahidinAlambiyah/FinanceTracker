@@ -50,7 +50,7 @@ export default function EditWalletScreen() {
           setName(w.name);
           setType(w.type);
         } else {
-          Alert.alert('Error', result.error || 'Failed to load wallet', [
+          Alert.alert('Could not load wallet', 'Please go back and try again.', [
             { text: 'OK', onPress: () => router.back() },
           ]);
         }
@@ -94,7 +94,7 @@ export default function EditWalletScreen() {
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Could not update wallet', result.error || 'Please check the wallet details and try again.');
+        Alert.alert('Could not update wallet', 'Please check the wallet details and try again.');
       }
     } catch (error) {
       Alert.alert('Could not update wallet', 'Please try again.');

@@ -192,7 +192,7 @@ export default function AddTransactionScreen() {
           { text: 'OK', onPress: () => router.back() },
         ]);
       } else {
-        Alert.alert('Could not add transaction', result.error || 'Please check the transaction details and try again.');
+        Alert.alert('Could not add transaction', 'Please check the transaction details and try again.');
       }
     } catch (error) {
       Alert.alert('Could not add transaction', 'Please try again.');

@@ -190,7 +190,7 @@ export default function CategoriesScreen() {
           setIsModalVisible(false);
           loadCategories();
         } else {
-          Alert.alert('Could not create category', result.error || 'Please check the category details and try again.');
+          Alert.alert('Could not create category', 'Please check the category details and try again.');
         }
       } else {
         if (!editingCategory) return;
@@ -207,7 +207,7 @@ export default function CategoriesScreen() {
           setIsModalVisible(false);
           loadCategories();
         } else {
-          Alert.alert('Could not update category', result.error || 'Please check the category details and try again.');
+          Alert.alert('Could not update category', 'Please check the category details and try again.');
         }
       }
     } catch (error) {
@@ -239,7 +239,7 @@ export default function CategoriesScreen() {
             if (result.success) {
               loadCategories();
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete category');
+              Alert.alert('Could not delete category', 'Please try again.');
             }
           },
         },
