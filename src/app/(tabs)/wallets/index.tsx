@@ -119,7 +119,7 @@ export default function WalletsScreen() {
               // Reload wallets
               loadWallets();
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete wallet');
+              Alert.alert('Could not delete wallet', 'Please try again.');
             }
           },
         },
