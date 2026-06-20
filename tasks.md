@@ -748,7 +748,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 
 ## Phase 13 — Testing and Quality
 
-- [ ] 13.1 Add unit test setup
+- [x] 13.1 Add unit test setup
   - Configure test runner.
   - Add basic test scripts.
   - Keep tests runnable locally.
@@ -775,6 +775,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Lint.
   - Tests.
   - Fix only relevant issues.
+
+**Phase 13.1 Status**: Minimal unit test setup is complete. Added Jest with the Expo preset, a `test` script, and one smoke test to prove the runner works. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, or navigation structure changed. Phase 13.2, 13.3, 13.4, and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 ---
 
