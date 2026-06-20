@@ -173,7 +173,7 @@ export default function TransactionsScreen() {
             if (result.success) {
               loadData();
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete transaction');
+              Alert.alert('Could not delete transaction', 'Please try again.');
             }
           },
         },
