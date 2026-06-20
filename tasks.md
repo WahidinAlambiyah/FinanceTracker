@@ -753,7 +753,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Add basic test scripts.
   - Keep tests runnable locally.
 
-- [ ] 13.2 Add utility tests
+- [x] 13.2 Add utility tests
   - Money formatter.
   - Date helper.
   - UUID helper.
@@ -777,6 +777,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Fix only relevant issues.
 
 **Phase 13.1 Status**: Minimal unit test setup is complete. Added Jest with the Expo preset, a `test` script, and one smoke test to prove the runner works. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, or navigation structure changed. Phase 13.2, 13.3, 13.4, and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
+
+**Phase 13.2 Status**: Utility tests are complete for existing money, date, UUID, and logger safety behavior. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No utility implementation, app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, or dependency changes were made. Phase 13.3, 13.4, and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 ---
 
