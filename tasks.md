@@ -765,7 +765,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Category breakdown.
   - Transfer logic.
 
-- [ ] 13.4 Add sync tests
+- [x] 13.4 Add sync tests
   - Queue item lifecycle.
   - Failed sync retry.
   - Last-write-wins conflict resolver.
@@ -781,6 +781,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 **Phase 13.2 Status**: Utility tests are complete for existing money, date, UUID, and logger safety behavior. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No utility implementation, app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, or dependency changes were made. Phase 13.3, 13.4, and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 **Phase 13.3 Status**: Finance logic tests are complete for existing balance calculation, monthly summary, category breakdown, and transfer validation/service behavior. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No finance formula, utility implementation, app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, repository/service logic, data model, navigation structure, or dependency changes were made. Phase 13.4 and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
+
+**Phase 13.4 Status**: Sync tests are complete for existing sync queue lifecycle, failed sync retry query behavior, current-user pushable/recovery query behavior, and Last Write Wins conflict resolution. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No sync implementation, sync behavior/control flow, app runtime behavior, SQLite schema, Supabase schema/RLS/config, auth/session behavior, repository/service logic, data model, navigation structure, dependency, or financial formula changes were made. Phase 13.5 remains open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 ---
 
