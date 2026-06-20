@@ -759,7 +759,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - UUID helper.
   - Logger safety.
 
-- [ ] 13.3 Add finance logic tests
+- [x] 13.3 Add finance logic tests
   - Balance calculator.
   - Monthly summary.
   - Category breakdown.
@@ -779,6 +779,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 **Phase 13.1 Status**: Minimal unit test setup is complete. Added Jest with the Expo preset, a `test` script, and one smoke test to prove the runner works. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, or navigation structure changed. Phase 13.2, 13.3, 13.4, and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 **Phase 13.2 Status**: Utility tests are complete for existing money, date, UUID, and logger safety behavior. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No utility implementation, app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, or dependency changes were made. Phase 13.3, 13.4, and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
+
+**Phase 13.3 Status**: Finance logic tests are complete for existing balance calculation, monthly summary, category breakdown, and transfer validation/service behavior. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand`. No finance formula, utility implementation, app runtime behavior, SQLite schema, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, repository/service logic, data model, navigation structure, or dependency changes were made. Phase 13.4 and 13.5 remain open. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed.
 
 ---
 
