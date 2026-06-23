@@ -790,7 +790,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 
 ## Phase 14 — Android Build Preparation
 
-- [ ] 14.1 Configure app metadata
+- [x] 14.1 Configure app metadata
   - App name.
   - App slug.
   - Android package name.
@@ -809,6 +809,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Test login.
   - Test offline transaction.
   - Test sync.
+
+**Phase 14.1 Status**: App metadata is configured for the existing app identity. `app.json` keeps app name `Finance Tracker`, slug `finance-tracker`, scheme `financetracker`, and Android package `id.alambiyah.financetracker`. The icon placeholder remains `./assets/icon.png`, Android adaptive icon assets remain under `assets/`, and splash placeholder now uses existing `./assets/splash-icon.png` with a white background. Validation passed with `npm.cmd run typecheck`. No EAS config, Android build, runtime source, tests, dependencies, package files, SQLite schema/migrations, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, Phase 14.2, or Phase 14.3 work was done.
 
 ---
 
