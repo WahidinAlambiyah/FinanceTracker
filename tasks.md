@@ -797,7 +797,7 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Icon placeholder.
   - Splash screen placeholder.
 
-- [ ] 14.2 Configure EAS
+- [x] 14.2 Configure EAS
   - Add EAS config.
   - Create development build profile.
   - Create preview build profile.
@@ -811,6 +811,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
   - Test sync.
 
 **Phase 14.1 Status**: App metadata is configured for the existing app identity. `app.json` keeps app name `Finance Tracker`, slug `finance-tracker`, scheme `financetracker`, and Android package `id.alambiyah.financetracker`. The icon placeholder remains `./assets/icon.png`, Android adaptive icon assets remain under `assets/`, and splash placeholder now uses existing `./assets/splash-icon.png` with a white background. Validation passed with `npm.cmd run typecheck`. No EAS config, Android build, runtime source, tests, dependencies, package files, SQLite schema/migrations, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, Phase 14.2, or Phase 14.3 work was done.
+
+**Phase 14.2 Status**: Minimal EAS build configuration is complete in `eas.json`. The development profile uses `developmentClient: true`, internal distribution, and Android APK output. The preview profile uses internal distribution and Android APK output. The production profile exists and remains minimal with default production Android output. `eas.json` JSON validation passed and validation passed with `npm.cmd run typecheck`. No EAS build, EAS build configuration command, Expo login, credential creation, environment variables/secrets, package files, dependencies, runtime source, tests, app identity, Android package name, SQLite schema/migrations, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, Phase 14.3, or Phase 15 work was done.
 
 ---
 
