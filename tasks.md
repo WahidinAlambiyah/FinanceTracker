@@ -814,6 +814,8 @@ The checklist below was written for the former push-only Phase 10 scope. Do not 
 
 **Phase 14.2 Status**: Minimal EAS build configuration is complete in `eas.json`. The development profile uses `developmentClient: true`, internal distribution, and Android APK output. The preview profile uses internal distribution and Android APK output. The production profile exists and remains minimal with default production Android output. `eas.json` JSON validation passed and validation passed with `npm.cmd run typecheck`. No EAS build, EAS build configuration command, Expo login, credential creation, environment variables/secrets, package files, dependencies, runtime source, tests, app identity, Android package name, SQLite schema/migrations, Supabase schema/RLS/config, sync behavior/control flow, auth/session behavior, financial formulas, repository/service logic, data model, navigation structure, Phase 14.3, or Phase 15 work was done.
 
+**Phase 14.3 Preview Build Blocker**: Android preview APK build succeeded, but the installed APK failed to launch. Logcat confirmed the root cause is missing `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` in the EAS build environment, causing `src/lib/supabase/client.ts` to throw during startup. The preview build profile is now bound to the EAS `preview` environment, and the owner must set those two EAS preview environment variables manually outside the repository. Phase 14.3 remains open until a rebuild succeeds and physical-device install, login, offline transaction, and manual sync tests pass.
+
 ---
 
 ## Phase 15 — Future Enhancements After MVP
