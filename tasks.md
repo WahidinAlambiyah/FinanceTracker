@@ -836,6 +836,8 @@ Do not implement before MVP acceptance criteria are met.
 - [ ] 15.10 Audit log
 - [ ] 15.11 iOS release preparation
 
+**Phase 15.1B Status**: CSV export service foundation is implemented, but Phase 15.1 remains open. Added a local SQLite export repository for active non-deleted current-user transactions, pure CSV formatting helpers, transaction row mapping with wallet/category name enrichment, and tests for CSV escaping, integer Rupiah preservation, income/expense/transfer mapping, empty export output, soft-delete query filtering, and CSV formula injection safety. No UI wiring, file writing, `expo-file-system` usage, `expo-sharing` usage, package/config/schema/Supabase/sync/auth/formula/navigation changes, or Phase 15.2+ work was done. Validation passed with `npm.cmd run typecheck` and `npm.cmd test -- --runInBand` (12 suites, 53 tests).
+
 ---
 
 ## MVP Completion Checklist
