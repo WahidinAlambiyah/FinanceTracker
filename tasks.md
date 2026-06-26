@@ -842,18 +842,20 @@ Do not implement before MVP acceptance criteria are met.
 
 The MVP is complete only when all items below are true:
 
-- [ ] User can register.
-- [ ] User can login.
-- [ ] User can create wallet.
-- [ ] User can create category.
-- [ ] User can create income transaction.
-- [ ] User can create expense transaction.
-- [ ] User can create transfer transaction.
-- [ ] User can see dashboard summary.
-- [ ] User can use the app while offline.
-- [ ] User can add transaction while offline.
+- [x] User can register.
+- [x] User can login.
+- [x] User can create wallet.
+- [x] User can create category.
+- [x] User can create income transaction.
+- [x] User can create expense transaction.
+- [x] User can create transfer transaction.
+- [x] User can see dashboard summary.
+- [x] User can use the app while offline.
+- [x] User can add transaction while offline.
 - [x] User can sync pending data after online.
 - [x] User can see pending/failed sync state.
 - [x] Supabase RLS prevents cross-user data access.
-- [ ] Local data persists after app restart.
-- [ ] Basic unit and repository tests pass.
+- [x] Local data persists after app restart.
+- [x] Basic unit and repository tests pass.
+
+**MVP Final Acceptance Status**: Android APK build `1.0.0` was manually tested by the owner on a physical Android device on 2026/06/25 using an owner-provided test account. Register/login passed. Wallet/category creation passed. Income, expense, and transfer transaction creation passed. Dashboard summary passed. Offline use and offline transaction creation passed. Manual `Sync Now` and pending sync state passed. Supabase RLS was confirmed passed. Local data persistence after app restart passed. Typecheck and automated tests passed with 11 suites / 42 tests. MVP acceptance checklist is complete. `11D.3` two-device convergence and `11D.4` expired-session behavior remain deferred and not considered passed. Lint remains unavailable/deferred by owner decision.
